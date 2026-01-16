@@ -14,13 +14,7 @@
 ## 🎯 The Engineering Goal
 **IssueSight** is a distributed, event-driven platform designed to solve a specific problem in the Open Source ecosystem: **Context Switching**.
 
-Junior engineers often struggle to contribute not because they can't code, but because they lack the domain context of massive repositories. IssueSight ingests GitHub issues and uses LLMs to generate **"Context Bridges"**—breaking down complex tickets into freshman-level prerequisites, architectural summaries, and implementation guides.
-
-**For Hiring Managers:** This project serves as a practical demonstration of my skills in:
-* **Distributed Systems:** Decoupling ingestion (Writes) from serving (Reads).
-* **Concurrency patterns in Go:** Using Goroutines and Channels for efficient data processing.
-* **Database Design:** Implementing hybrid Relational/JSONB schemas in PostgreSQL.
-* **Caching Strategies:** Utilizing the "Cache-Aside" pattern for high-read throughput.
+Junior engineers often struggle to contribute not because they can't code, but because they lack the domain context of massive repositories. IssueSight ingests GitHub issues and uses LLMs to generate **"Context Bridges"** from breaking down complex tickets into junior-level prerequisites, architectural summaries, and implementation guides.
 
 ---
 
