@@ -69,10 +69,7 @@ flowchart TB
     AIWorker -->|E. Write Data| Postgres
 
     %% --- LINK STYLES ---
-    %% Style the first 4 links (User Flow) with Orange
     linkStyle 0,1,2,3 stroke:#f57c00,stroke-width:2px;
-    
-    %% Style the last 5 links (Ingestion Flow) with Blue
     linkStyle 4,5,6,7,8 stroke:#1565c0,stroke-width:2px;
     ```
 
