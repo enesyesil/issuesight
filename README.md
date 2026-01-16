@@ -21,7 +21,6 @@ Junior engineers often struggle to contribute not because they can't code, but b
 ## 🏗️ System Architecture
 The system follows a vertical **Microservices Layering** pattern. Traffic flows from the Clients (Top) through the Go Middleware (Center) down to the Persistence Layer (Bottom).
 
-```mermaid
 flowchart TB
     %% --- GLOBAL STYLES ---
     classDef client fill:#fff3e0,stroke:#f57c00,stroke-width:2px,rx:10,ry:10;
@@ -71,7 +70,6 @@ flowchart TB
     %% --- LINK STYLES ---
     linkStyle 0,1,2,3 stroke:#f57c00,stroke-width:2px;
     linkStyle 4,5,6,7,8 stroke:#1565c0,stroke-width:2px;
-    ```
 
 ### 🔁 Data Flow Breakdown
 1.  **Ingestion (The Write Path - Blue Lines):** A background `Collector` service polls GitHub and pushes raw events to a **Redis Stream**. This ensures that if the GitHub API is slow or rate-limited, it does not block the rest of the application.
