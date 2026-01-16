@@ -21,6 +21,7 @@ Junior engineers often struggle to contribute not because they can't code, but b
 ## 🏗️ System Architecture
 The system follows a vertical **Microservices Layering** pattern. Traffic flows from the Clients (Top) through the Go Middleware (Center) down to the Persistence Layer (Bottom).
 
+```mermaid
 flowchart TB
     %% --- GLOBAL STYLES ---
     classDef client fill:#fff3e0,stroke:#f57c00,stroke-width:2px,rx:10,ry:10;
