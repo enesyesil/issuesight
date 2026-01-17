@@ -23,6 +23,94 @@ The system follows a vertical **Microservices Layering** pattern. Traffic flows 
 
 ![IssueSight Architecture Diagram](./issuesight-design.png)
 
+
+``` mermaid
+---
+config:
+  theme: neo-dark
+---
+flowchart TB
+ subgraph ClientLayer["1. Client Layer"]
+    direction TB
+        UserApp("User")
+  end
+ subgraph GatewayLayer["2. Gateway Layer"]
+    direction TB
+        APIGateway["API Gateway"]
+        AuthMgr["Auth & Quota Manager"]
+        LockMgr["Lock Manager"]
+  end
+ subgraph ExternalLayer["5. External Ecosystem"]
+        GitHub("GitHub API")
+        LLM("LLM Provider")
+  end
+ subgraph LogicLayer["3. Logic & Processing Layer"]
+    direction TB
+        Collector["Collector Worker"]
+        AIWorker["AI Generator Worker"]
+  end
+ subgraph DataLayer["4. Data & State Layer"]
+    direction TB
+        MongoDB[("MongoDB\nAuth & Quotas")]
+        Redis[("Redis Speed Layer\nCache/Locks/Stream")]
+        Postgres[("PostgreSQL\nTutorial Archive")]
+  end
+    UserApp -- "1. Submit Issue / Auth" --> APIGateway
+    APIGateway -.-> AuthMgr & LockMgr
+    AuthMgr -- "2. Check Limit" --> MongoDB
+    LockMgr -- "3. Distributed Lock" --> Redis
+    APIGateway -- "4. Enqueue Task" --> Redis
+    Collector -- "5. Poll Metadata" --> GitHub
+    Collector -- "6. Push Context" --> Redis
+    Redis -- "7. Stream Consume" --> AIWorker
+    AIWorker -- "8. Generate Content" --> LLM
+    AIWorker -- "9. Persist Tutorial" --> Postgres
+
+     UserApp:::client
+     APIGateway:::gateway
+     AuthMgr:::gateway
+     LockMgr:::gateway
+     GitHub:::external
+     LLM:::external
+     Collector:::worker
+     AIWorker:::worker
+     MongoDB:::data
+     Redis:::data
+     Postgres:::data
+    classDef client fill:#fff3e0,stroke:#f57c00,stroke-width:2px,rx:10,ry:10
+    classDef gateway fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,rx:5,ry:5
+    classDef worker fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,rx:5,ry:5
+    classDef data fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,shape:cyl
+    classDef external fill:#eeeeee,stroke:#999999,stroke-width:2px,stroke-dasharray: 5 5,rx:5,ry:5
+    style UserApp fill:#00C853,color:#000000
+    style APIGateway fill:#2962FF
+    style AuthMgr fill:#2962FF
+    style LockMgr fill:#2962FF
+    style GitHub fill:#2962FF
+    style LLM fill:#00C853
+    style Collector fill:#2962FF
+    style AIWorker fill:#FFD600,color:#000000
+    style MongoDB fill:#FF6D00
+    style Redis fill:#2962FF
+    style Postgres fill:#00C853
+    style GatewayLayer stroke:#00C853,fill:#00C853,color:#000000
+    style DataLayer fill:#FF6D00,color:#000000
+    style LogicLayer fill:#00C853,color:#000000
+    style ExternalLayer fill:#FFD600,color:#000000
+    style ClientLayer fill:#BBDEFB,color:#000000
+    linkStyle 0 stroke:#f57c00,stroke-width:2px,fill:none
+    linkStyle 1 stroke:#2962FF,fill:none
+    linkStyle 2 stroke:#2962FF,fill:none
+    linkStyle 3 stroke:#2962FF,fill:none
+    linkStyle 4 stroke:#2962FF,fill:none
+    linkStyle 5 stroke:#2962FF,fill:none
+    linkStyle 6 stroke:#000000,fill:none
+    linkStyle 7 stroke:#000000,fill:none
+    linkStyle 8 stroke:#2e7d32,stroke-width:2px,fill:none
+    linkStyle 9 stroke:#2e7d32,stroke-width:2px,fill:none
+    linkStyle 10 stroke:#2962FF,fill:none
+```
+
 ### 🔁 Data Flow Breakdown
 1.  **Ingestion (The Write Path - Blue Lines):** A background `Collector` service polls GitHub and pushes raw events to a **Redis Stream**. This ensures that if the GitHub API is slow or rate-limited, it does not block the rest of the application.
 2.  **Processing (The Worker):** The `AI Worker` consumes the stream, utilizing `OpenAI` to analyze the code complexity. It determines if an issue is truly "Junior Friendly" or if it requires advanced knowledge.
