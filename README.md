@@ -19,7 +19,7 @@ Junior engineers often struggle to contribute not because they can't code, but b
 ---
 
 ## 🏗️ System Architecture
-The system follows a vertical **Microservices Layering** pattern. Traffic flows from the Clients (Top) through the Go Middleware (Center) down to the Persistence Layer (Bottom).
+The system follows a vertical **Microservices Layering** pattern in a monorepo structure. Traffic flows from the Next.js Frontend (Client) through the Go Gateway (Center) down to the Persistence Layer (Bottom).
 
 ![IssueSight Architecture Diagram](./issuesight-design.png)
 
@@ -137,12 +137,31 @@ Go was selected for its native concurrency primitives (`goroutines`), which are 
 
 | Component | Technology | Reasoning |
 | :--- | :--- | :--- |
+| **Frontend** | Next.js 14 (TypeScript, App Router) | Modern React framework with server-side rendering. |
 | **Backend** | Golang (Gin/Standard Lib) | Strong typing, high performance, native concurrency. |
 | **Database** | PostgreSQL 16 | ACID compliance with JSONB support. |
 | **Message Broker** | Redis Streams | Lightweight, low-latency event buffering. |
 | **Caching** | Redis KV | High-speed read access for API endpoints. |
 | **AI Layer** | OpenAI GPT-4o | Context analysis and prerequisite generation. |
 | **Infrastructure** | Docker Compose | Reproducible local development environment. |
+
+---
+
+## 📁 Project Structure
+
+```
+issuesight/
+├── web/                    # Next.js Frontend Service
+├── backend/                # Go Microservices
+│   ├── gateway/           # API Gateway
+│   ├── collector/         # GitHub Issue Collector
+│   └── ai-processor/      # AI Content Generator
+├── internal/              # Shared Go Packages
+│   ├── platform/         # Platform utilities (db, stream, lock)
+│   └── domain/           # Shared domain types
+└── deployments/           # Docker Compose & Environment Configs
+```
+
 
 
 
