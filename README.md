@@ -21,7 +21,7 @@ Junior engineers often struggle to contribute not because they can't code, but b
 ## 🏗️ System Architecture
 The system follows a vertical **Microservices Layering** pattern. Traffic flows from the Clients (Top) through the Go Middleware (Center) down to the Persistence Layer (Bottom).
 
-![IssueSight Architecture Diagram](./issuesight-diagram.png)
+![IssueSight Architecture Diagram](./issuesight-design.png)
 
 ### 🔁 Data Flow Breakdown
 1.  **Ingestion (The Write Path - Blue Lines):** A background `Collector` service polls GitHub and pushes raw events to a **Redis Stream**. This ensures that if the GitHub API is slow or rate-limited, it does not block the rest of the application.
