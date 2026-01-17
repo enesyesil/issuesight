@@ -1,5 +1,3 @@
-# issuesight
-
 # IssueSight 🔭
 
 > **Bridging the gap between "Good First Issues" and "Great First Contributions" via AI-driven mentorship.**
