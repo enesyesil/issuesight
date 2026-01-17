@@ -9,14 +9,14 @@
 
 ---
 
-## 🎯 The Engineering Goal
+## The Engineering Goal
 **IssueSight** is a distributed, event-driven platform designed to solve a specific problem in the Open Source ecosystem: **Context Switching**.
 
 Junior engineers often struggle to contribute not because they can't code, but because they lack the domain context of massive repositories. IssueSight ingests GitHub issues and uses LLMs to generate **"Context Bridges"** from breaking down complex tickets into junior-level prerequisites, architectural summaries, and implementation guides.
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 The system follows a vertical **Microservices Layering** pattern in a monorepo structure. Traffic flows from the Next.js Frontend (Client) through the Go Gateway (Center) down to the Persistence Layer (Bottom).
 
 ![IssueSight Architecture Diagram](./issuesight-design.png)
@@ -109,14 +109,14 @@ flowchart TB
     linkStyle 10 stroke:#2962FF,fill:none
 ```
 
-### 🔁 Data Flow Breakdown
+### Data Flow Breakdown
 1.  **Ingestion (The Write Path - Blue Lines):** A background `Collector` service polls GitHub and pushes raw events to a **Redis Stream**. This ensures that if the GitHub API is slow or rate-limited, it does not block the rest of the application.
 2.  **Processing (The Worker):** The `AI Worker` consumes the stream, utilizing `OpenAI` to analyze the code complexity. It determines if an issue is truly "Junior Friendly" or if it requires advanced knowledge.
 3.  **Serving (The Read Path - Orange Lines):** The `API Gateway` serves the frontend. It implements a **Cache-Aside** strategy: popular issues are served from Redis KV memory (<5ms), while the database is only hit on cache misses.
 
 ---
 
-## 🛠️ Key Technical Decisions
+## Key Technical Decisions
 
 ### Why Redis Streams?
 I chose Redis Streams over a simple cron job to **decouple** the fetching logic from the processing logic. This allows the system to scale independently—if issue volume spikes, I can simply spin up more `AI Worker` replicas without changing the Collector code.
@@ -131,7 +131,7 @@ Go was selected for its native concurrency primitives (`goroutines`), which are 
 
 ---
 
-## 💻 Tech Stack
+## Tech Stack
 
 | Component | Technology | Reasoning |
 | :--- | :--- | :--- |
@@ -145,7 +145,7 @@ Go was selected for its native concurrency primitives (`goroutines`), which are 
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 issuesight/
