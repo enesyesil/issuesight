@@ -119,7 +119,7 @@ flowchart TB
 
 ## Key Technical Decisions
 
-### 📊 Data Model
+### Data Model
 
 The database schema follows a normalized relational design with PostgreSQL as the primary data store. The ERD below illustrates the core entities and their relationships:
 
@@ -145,8 +145,8 @@ This design enables efficient querying, supports concept-based discovery, and ma
 
 ---
 
-## 🛠️ Key Technical Decisions
->>>>>>> Stashed changes
+## Key Technical Decisions
+
 
 ### Why Redis Streams?
 I chose Redis Streams over a simple cron job to **decouple** the fetching logic from the processing logic. This allows the system to scale independently—if issue volume spikes, I can simply spin up more `AI Worker` replicas without changing the Collector code.
