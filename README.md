@@ -220,21 +220,37 @@ erDiagram
 
 ### Core Entities
 
-- **PROJECTS**: Repositories tracked by IssueSight, storing GitHub repository metadata and language information
-- **GITHUB_ISSUES**: Issues fetched from GitHub, linked to projects with raw JSONB data for flexibility
-- **TUTORIAL_CONTENTS**: AI-generated context bridges (one per issue), stored as markdown with status tracking
-- **USERS**: User accounts with quota management and last request tracking
-- **USER_IDENTITIES**: OAuth provider mappings (GitHub, Google, etc.) for multi-provider authentication
-- **TUTORIALS**: User-tutorial relationships tracking who unlocked which tutorials
-- **CONCEPTS**: Reusable concept definitions (e.g., "message-queues", "authentication") that can be tagged to projects and tutorials
+- **PROJECTS**: GitHub repositories tracked by IssueSight, storing repository metadata (owner, name, language) with unique GitHub repository ID
+- **GITHUB_ISSUES**: Issues fetched from GitHub, linked to projects with raw JSONB data (`raw_data`) containing body, comments, and labels for flexibility
+- **TUTORIAL_CONTENTS**: AI-generated context bridges (one per issue via unique `issue_id` constraint), stored as markdown with status tracking (PENDING, COMPLETED, FAILED)
+- **USERS**: User accounts with quota management via `last_requested_at` timestamp for rate limiting
+- **USER_IDENTITIES**: OAuth provider mappings (GitHub, Google) linking external provider IDs to user accounts for multi-provider authentication
+- **TUTORIALS**: Junction table tracking which users have unlocked which tutorial contents, with `is_original_requester` flag
+- **CONCEPTS**: Reusable concept definitions (e.g., "message-queues") identified by unique slugs, used for tagging and categorization
+- **CONCEPT_RELATIONSHIPS**: Self-referential table enabling hierarchical concept relationships (parent-child) with relationship types like "subconcept_of"
+- **PROJECT_CONCEPTS**: Junction table linking projects to concepts for project categorization
+- **TUTORIAL_CONCEPTS**: Junction table linking tutorial contents to concepts for content tagging
 
 ### Key Relationships
 
-- **One-to-Many**: Projects → Issues, Users → Tutorials, Users → Identities
-- **One-to-One**: Issue → Tutorial Content (unique constraint ensures one tutorial per issue)
-- **Many-to-Many**: Tutorials ↔ Concepts (via `TUTORIAL_CONCEPTS`), Projects ↔ Concepts (via `PROJECT_CONCEPTS`)
+- **One-to-Many**: 
+  - `USERS` → `USER_IDENTITIES` (users can authenticate via multiple providers)
+  - `USERS` → `TUTORIALS` (users can unlock multiple tutorials)
+  - `PROJECTS` → `GITHUB_ISSUES` (projects contain multiple issues)
+  - `TUTORIAL_CONTENTS` → `TUTORIALS` (one tutorial content can serve multiple users)
+  - `CONCEPTS` → `PROJECT_CONCEPTS` (concepts can tag multiple projects)
+  - `CONCEPTS` → `TUTORIAL_CONCEPTS` (concepts can tag multiple tutorials)
+  - `CONCEPTS` → `CONCEPT_RELATIONSHIPS` (concepts can have parent/child relationships)
 
-This design enables efficient querying, supports concept-based discovery, and maintains data integrity while allowing flexible JSONB storage for volatile GitHub API responses.
+- **One-to-One**: 
+  - `GITHUB_ISSUES` → `TUTORIAL_CONTENTS` (unique `issue_id` constraint ensures one tutorial per issue)
+
+- **Many-to-Many**: 
+  - `PROJECTS` ↔ `CONCEPTS` (via `PROJECT_CONCEPTS` junction table)
+  - `TUTORIAL_CONTENTS` ↔ `CONCEPTS` (via `TUTORIAL_CONCEPTS` junction table)
+  - `CONCEPTS` ↔ `CONCEPTS` (via `CONCEPT_RELATIONSHIPS` for hierarchical relationships)
+
+This design enables efficient querying, supports concept-based discovery and hierarchical concept organization, maintains data integrity through proper constraints, and allows flexible JSONB storage for volatile GitHub API responses while tracking user access and quota limits.
 
 ---
 
