@@ -125,6 +125,93 @@ The database schema follows a normalized relational design with PostgreSQL as th
 
 ![IssueSight Entity-Relationship Diagram](./er-diagram.png)
 
+```mermaid
+erDiagram
+    USERS ||--o{ USER_IDENTITIES : "authenticates"
+    USERS ||--o{ TUTORIALS : "unlocks"
+    
+    PROJECTS ||--o{ GITHUB_ISSUES : "contains"
+    PROJECTS ||--o{ PROJECT_CONCEPTS : "categorized_by"
+    
+    GITHUB_ISSUES ||--o| TUTORIAL_CONTENTS : "generates"
+    
+    CONCEPTS ||--o{ PROJECT_CONCEPTS : "defines"
+    CONCEPTS ||--o{ TUTORIAL_CONCEPTS : "tags"
+    
+    TUTORIAL_CONTENTS ||--o{ TUTORIALS : "serves"
+    TUTORIAL_CONTENTS ||--o{ TUTORIAL_CONCEPTS : "explains"
+
+    USERS {
+        uuid id PK
+        string email UK
+        string display_name
+        string avatar_url
+        timestamp last_requested_at "Quota Check"
+        timestamp created_at
+    }
+
+    USER_IDENTITIES {
+        uuid id PK
+        uuid user_id FK
+        string provider "github, google"
+        string provider_id UK "External ID"
+    }
+
+    PROJECTS {
+        uuid id PK
+        bigint gh_repo_id UK
+        string owner_handle
+        string repo_name
+        string full_name
+        string language
+        timestamp created_at
+    }
+
+    GITHUB_ISSUES {
+        uuid id PK
+        uuid project_id FK
+        int issue_number
+        bigint gh_issue_id UK
+        jsonb raw_data "Body/Comments/Labels"
+        timestamp last_synced_at
+    }
+
+    TUTORIAL_CONTENTS {
+        uuid id PK
+        uuid issue_id FK "Unique per Issue"
+        string title
+        text markdown_body "The AI Output"
+        string status "COMPLETED/FAILED"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    TUTORIALS {
+        uuid id PK
+        uuid user_id FK
+        uuid content_id FK
+        boolean is_original_requester
+        timestamp created_at
+    }
+
+    CONCEPTS {
+        uuid id PK
+        string slug UK "message-queues"
+        string name
+        text description
+    }
+
+    PROJECT_CONCEPTS {
+        uuid project_id FK
+        uuid concept_id FK
+    }
+
+    TUTORIAL_CONCEPTS {
+        uuid content_id FK
+        uuid concept_id FK
+    }
+```
+
 ### Core Entities
 
 - **PROJECTS**: Repositories tracked by IssueSight, storing GitHub repository metadata and language information
