@@ -125,7 +125,7 @@ The database schema follows a normalized relational design with PostgreSQL as th
 
 ```mermaid
 erDiagram
-    USERS ||--o{ USER_IDENTITIES : "authenticates"
+    USERS ||--o{ USER_IDENTITIES : "authenticates_via"
     USERS ||--o{ TUTORIALS : "unlocks"
     
     PROJECTS ||--o{ GITHUB_ISSUES : "contains"
@@ -135,6 +135,8 @@ erDiagram
     
     CONCEPTS ||--o{ PROJECT_CONCEPTS : "defines"
     CONCEPTS ||--o{ TUTORIAL_CONCEPTS : "tags"
+    CONCEPTS ||--o{ CONCEPT_RELATIONSHIPS : "is_parent_of"
+    CONCEPTS ||--o{ CONCEPT_RELATIONSHIPS : "is_child_of"
     
     TUTORIAL_CONTENTS ||--o{ TUTORIALS : "serves"
     TUTORIAL_CONTENTS ||--o{ TUTORIAL_CONCEPTS : "explains"
@@ -144,15 +146,15 @@ erDiagram
         string email UK
         string display_name
         string avatar_url
-        timestamp last_requested_at "Quota Check"
+        timestamp last_requested_at "Quota_Anchor"
         timestamp created_at
     }
 
     USER_IDENTITIES {
         uuid id PK
         uuid user_id FK
-        string provider "github, google"
-        string provider_id UK "External ID"
+        string provider "github_or_google"
+        string provider_id UK "External_ID"
     }
 
     PROJECTS {
@@ -160,7 +162,7 @@ erDiagram
         bigint gh_repo_id UK
         string owner_handle
         string repo_name
-        string full_name
+        string full_name UK
         string language
         timestamp created_at
     }
@@ -170,16 +172,16 @@ erDiagram
         uuid project_id FK
         int issue_number
         bigint gh_issue_id UK
-        jsonb raw_data "Body/Comments/Labels"
+        jsonb raw_data "Cached_GitHub_JSON"
         timestamp last_synced_at
     }
 
     TUTORIAL_CONTENTS {
         uuid id PK
-        uuid issue_id FK "Unique per Issue"
+        uuid issue_id FK "Unique_per_Issue"
         string title
-        text markdown_body "The AI Output"
-        string status "COMPLETED/FAILED"
+        text markdown_body "The_AI_Output"
+        string status "PENDING_COMPLETED_FAILED"
         timestamp created_at
         timestamp updated_at
     }
@@ -194,9 +196,15 @@ erDiagram
 
     CONCEPTS {
         uuid id PK
-        string slug UK "message-queues"
+        string slug UK "e-g-message-queues"
         string name
         text description
+    }
+
+    CONCEPT_RELATIONSHIPS {
+        uuid parent_id FK
+        uuid child_id FK
+        string rel_type "subconcept_of"
     }
 
     PROJECT_CONCEPTS {
