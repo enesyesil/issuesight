@@ -116,7 +116,37 @@ flowchart TB
 
 ---
 
+<<<<<<< Updated upstream
 ## Key Technical Decisions
+=======
+## 📊 Data Model
+
+The database schema follows a normalized relational design with PostgreSQL as the primary data store. The ERD below illustrates the core entities and their relationships:
+
+![IssueSight Entity-Relationship Diagram](./issuesight-erd.png)
+
+### Core Entities
+
+- **PROJECTS**: Repositories tracked by IssueSight, storing GitHub repository metadata and language information
+- **GITHUB_ISSUES**: Issues fetched from GitHub, linked to projects with raw JSONB data for flexibility
+- **TUTORIAL_CONTENTS**: AI-generated context bridges (one per issue), stored as markdown with status tracking
+- **USERS**: User accounts with quota management and last request tracking
+- **USER_IDENTITIES**: OAuth provider mappings (GitHub, Google, etc.) for multi-provider authentication
+- **TUTORIALS**: User-tutorial relationships tracking who unlocked which tutorials
+- **CONCEPTS**: Reusable concept definitions (e.g., "message-queues", "authentication") that can be tagged to projects and tutorials
+
+### Key Relationships
+
+- **One-to-Many**: Projects → Issues, Users → Tutorials, Users → Identities
+- **One-to-One**: Issue → Tutorial Content (unique constraint ensures one tutorial per issue)
+- **Many-to-Many**: Tutorials ↔ Concepts (via `TUTORIAL_CONCEPTS`), Projects ↔ Concepts (via `PROJECT_CONCEPTS`)
+
+This design enables efficient querying, supports concept-based discovery, and maintains data integrity while allowing flexible JSONB storage for volatile GitHub API responses.
+
+---
+
+## 🛠️ Key Technical Decisions
+>>>>>>> Stashed changes
 
 ### Why Redis Streams?
 I chose Redis Streams over a simple cron job to **decouple** the fetching logic from the processing logic. This allows the system to scale independently—if issue volume spikes, I can simply spin up more `AI Worker` replicas without changing the Collector code.
