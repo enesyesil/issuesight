@@ -118,8 +118,8 @@ flowchart TB
 
 
 ## Key Technical Decisions
-=======
-## 📊 Data Model
+
+### 📊 Data Model
 
 The database schema follows a normalized relational design with PostgreSQL as the primary data store. The ERD below illustrates the core entities and their relationships:
 
