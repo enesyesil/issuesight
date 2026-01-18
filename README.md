@@ -116,14 +116,14 @@ flowchart TB
 
 ---
 
-<<<<<<< Updated upstream
+
 ## Key Technical Decisions
 =======
 ## 📊 Data Model
 
 The database schema follows a normalized relational design with PostgreSQL as the primary data store. The ERD below illustrates the core entities and their relationships:
 
-![IssueSight Entity-Relationship Diagram](./issuesight-erd.png)
+![IssueSight Entity-Relationship Diagram](./er-diagram.png)
 
 ### Core Entities
 
