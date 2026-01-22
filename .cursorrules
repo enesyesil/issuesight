@@ -1,0 +1,17 @@
+# IssueSight Architecture Rules
+
+## Directory Structure
+- Frontend (Next.js) lives in `/web` directory
+- Go microservices live in `/backend` subdirectories (gateway, collector, ai-processor)
+- Shared Go packages live in `/internal` (platform, domain)
+- Deployment configs live in `/deployments`
+
+## Code Organization
+- Each service in `/backend` is independent and can be built/run separately
+- Shared logic should be placed in `/internal` packages
+- Frontend service in `/web` is a separate Next.js application
+
+## Best Practices
+- Do not hardcode configuration values
+- Use environment variables for service configuration
+- Keep services decoupled and independent
