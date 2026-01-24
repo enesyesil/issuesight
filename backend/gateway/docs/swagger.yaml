@@ -1,0 +1,295 @@
+basePath: /api
+definitions:
+  backend_gateway_handler.AuthTokenResponse:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/backend_gateway_handler.AuthUserResponse'
+    type: object
+  backend_gateway_handler.AuthUserResponse:
+    properties:
+      avatar_url:
+        type: string
+      display_name:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+    type: object
+  backend_gateway_handler.ErrorResponse:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  backend_gateway_handler.HealthResponse:
+    properties:
+      checks:
+        additionalProperties:
+          type: string
+        type: object
+      status:
+        type: string
+    type: object
+  backend_gateway_handler.IssueSubmitRequest:
+    properties:
+      url:
+        type: string
+    type: object
+  backend_gateway_handler.IssueSubmitResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  backend_gateway_handler.LogoutResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  backend_gateway_handler.TutorialListResponse:
+    properties:
+      count:
+        type: integer
+      tutorials:
+        items:
+          $ref: '#/definitions/backend_gateway_handler.TutorialResponse'
+        type: array
+    type: object
+  backend_gateway_handler.TutorialResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      markdown_body:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: API Gateway for IssueSight application.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: IssueSight Gateway API
+  version: "1.0"
+paths:
+  /auth/callback:
+    get:
+      description: Handles the callback from OAuth providers, creates user session,
+        and returns JWT.
+      parameters:
+      - description: OAuth state
+        in: query
+        name: state
+        required: true
+        type: string
+      - description: OAuth code
+        in: query
+        name: code
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.AuthTokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.ErrorResponse'
+      summary: OAuth Callback
+      tags:
+      - auth
+  /auth/github:
+    get:
+      description: Redirects to GitHub for OAuth authentication
+      responses:
+        "307":
+          description: Temporary Redirect
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.ErrorResponse'
+      summary: Initiate GitHub OAuth
+      tags:
+      - auth
+  /auth/google:
+    get:
+      description: Redirects to Google for OAuth authentication
+      responses:
+        "307":
+          description: Temporary Redirect
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.ErrorResponse'
+      summary: Initiate Google OAuth
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      description: Logs out the user.
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.LogoutResponse'
+      summary: Logout
+      tags:
+      - auth
+  /auth/me:
+    get:
+      description: Returns the profile of the currently authenticated user.
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.AuthUserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Current User
+      tags:
+      - auth
+  /health:
+    get:
+      description: Checks the health of the service and its dependencies.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.HealthResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.HealthResponse'
+      summary: Health Check
+      tags:
+      - health
+  /issues:
+    post:
+      consumes:
+      - application/json
+      description: Submits a GitHub issue URL for processing.
+      parameters:
+      - description: Issue submission request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/backend_gateway_handler.IssueSubmitRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.IssueSubmitResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.ErrorResponse'
+      summary: Submit Issue
+      tags:
+      - issues
+  /tutorials:
+    get:
+      description: Lists the tutorials for the authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.TutorialListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.ErrorResponse'
+      summary: List Tutorials
+      tags:
+      - tutorials
+  /tutorials/{id}:
+    get:
+      description: Retrieves a specific tutorial by ID.
+      parameters:
+      - description: Tutorial ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.TutorialResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/backend_gateway_handler.ErrorResponse'
+      summary: Get Tutorial
+      tags:
+      - tutorials
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

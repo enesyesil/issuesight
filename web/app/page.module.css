@@ -1,0 +1,136 @@
+.page {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 65px);
+}
+
+/* Hero Section */
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: var(--spacing-16) var(--spacing-6);
+    text-align: center;
+}
+
+.heroContent {
+    max-width: 800px;
+    animation: slideUp var(--transition-slow) ease-out;
+}
+
+/* Badge */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-4);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-8);
+}
+
+.badge svg {
+    color: var(--accent-primary);
+}
+
+/* Title */
+.title {
+    font-size: clamp(2.5rem, 6vw, var(--font-size-6xl));
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-6);
+}
+
+.titleAccent {
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Subtitle */
+.subtitle {
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto var(--spacing-10);
+    line-height: 1.7;
+}
+
+/* CTAs */
+.ctas {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-4);
+    flex-wrap: wrap;
+}
+
+/* Stats Section */
+.stats {
+    padding: var(--spacing-12) var(--spacing-6);
+    border-top: 1px solid var(--border-color);
+}
+
+.statsContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-16);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.statValue {
+    font-size: var(--font-size-4xl);
+    font-weight: 700;
+    color: var(--accent-primary);
+}
+
+.statLabel {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .statsContainer {
+        flex-direction: column;
+        gap: var(--spacing-8);
+    }
+
+    .ctas {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .ctas a {
+        width: 100%;
+    }
+}
+
+/* Animation */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
