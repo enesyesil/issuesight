@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
-      - "5432:5432"
+      - "5435:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -28,6 +28,46 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+
+  gateway:
+    build:
+      context: ..
+      dockerfile: backend/gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - ../.env
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/issuesight?sslmode=disable
+      - REDIS_ADDR=redis:6379
+      - POSTGRES_URL=postgres://postgres:postgres@postgres:5432/issuesight?sslmode=disable
+    depends_on:
+      - postgres
+      - redis
+
+  collector:
+    build:
+      context: ..
+      dockerfile: backend/collector/Dockerfile
+    environment:
+      - REDIS_ADDR=redis:6379
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+    depends_on:
+      - redis
+
+  ai-processor:
+    build:
+      context: ..
+      dockerfile: backend/ai-processor/Dockerfile
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/issuesight?sslmode=disable
+      - REDIS_ADDR=redis:6379
+      - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_PROVIDER=${LLM_PROVIDER:-openai}
+      - LLM_MODEL=${LLM_MODEL:-gpt-4o}
+    depends_on:
+      - postgres
+      - redis
 
 volumes:
   postgres_data:

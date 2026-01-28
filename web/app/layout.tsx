@@ -1,30 +1,26 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { Header } from '@/components/layout/Header';
 import './globals.css';
+import { cn } from '@/lib/utils';
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-});
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
-  title: 'IssueSight - Transform GitHub Issues into Learning Tutorials',
-  description: 'IssueSight analyzes GitHub issues and generates comprehensive, step-by-step tutorials. Turn complex problems into teachable moments.',
-  keywords: ['GitHub', 'tutorials', 'AI', 'learning', 'open source'],
+  title: 'IssueSight',
+  description: 'Turn GitHub Issues into AI-powered Tutorials',
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body>
-        <Header />
-        <main>{children}</main>
-      </body>
+    <html lang="en" suppressHydrationWarning>
+      <body className={cn(
+        "min-h-screen bg-background font-sans antialiased",
+        inter.variable
+      )}>{children}</body>
     </html>
   );
 }

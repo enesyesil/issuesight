@@ -1,5 +1,5 @@
 // Package llm provides an LLM client wrapper with retry logic for the AI Processor.
-//
+
 // It wraps the platform LLM client (internal/platform/llm) and adds:
 //   - Retry logic with exponential backoff
 //   - Rate limit handling
@@ -27,13 +27,11 @@ var (
 
 // Config holds configuration for the LLM client wrapper.
 type Config struct {
-	// MaxRetries is the maximum number of retry attempts for transient errors.
-	// Default: 3
+	// MaxRetries is the maximum number of retry attempts for transient errors. Default: 3
 	MaxRetries int
 
 	// BaseDelay is the initial delay between retries.
-	// Subsequent retries use exponential backoff: baseDelay * 2^attempt
-	// Default: 1 second
+	// Subsequent retries use exponential backoff: baseDelay * 2^attempt Default: 1 second
 	BaseDelay time.Duration
 
 	// MaxDelay is the maximum delay between retries.

@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 // Config holds all environment variables for the application.
@@ -28,7 +30,7 @@ type Config struct {
 	GoogleClientSecret string
 
 	// LLM (provider-agnostic via LangChain)
-	LLMProvider    string  // "openai", "anthropic", "ollama", "gemini"
+	LLMProvider    string  // "openai", "anthropic", "ollama", "gemini", "cohere"
 	LLMAPIKey      string  // API key for the provider
 	LLMModel       string  // e.g., "gpt-4o", "claude-3-opus"
 	LLMBaseURL     string  // for Ollama or custom endpoints
@@ -50,6 +52,9 @@ type Config struct {
 
 // Load reads configuration from environment variables.
 func Load() (*Config, error) {
+	// Load .env file if it exists
+	_ = godotenv.Load()
+
 	cfg := &Config{
 		// Database
 		PostgresURL: getEnv("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/issuesight?sslmode=disable"),

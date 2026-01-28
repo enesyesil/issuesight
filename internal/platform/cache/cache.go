@@ -1,14 +1,14 @@
 // Package cache provides a simple key-value caching interface.
-//
+
 // WHAT IS CACHING?
 // Caching is storing frequently accessed data in a fast location (like RAM)
 // so you don't have to fetch it from a slower source (like a database) every time.
-//
+
 // ANALOGY - THE LIBRARY DESK:
 // Imagine you're studying and need to look things up:
 //   - Slow way: Walk to the bookshelf, find the book, bring it back (database query)
 //   - Fast way: Keep frequently used books on your desk (cache)
-//
+
 // THE CACHE-ASIDE PATTERN:
 // This is how we use caching in IssueSight:
 //
@@ -18,28 +18,8 @@
 //  4. IF NO (cache miss):  Fetch from database (~50ms)
 //     Store in cache for next time
 //     Return the data
-//
-// CODE EXAMPLE:
-//
-//	func GetIssue(ctx context.Context, issueID string) (*Issue, error) {
-//	    // Try cache first
-//	    data, err := cache.Get(ctx, "issue:"+issueID)
-//	    if err == nil {
-//	        return deserialize(data), nil  // Cache hit!
-//	    }
-//
-//	    // Cache miss - fetch from database
-//	    issue, err := db.GetIssue(issueID)
-//	    if err != nil {
-//	        return nil, err
-//	    }
-//
-//	    // Store in cache for next time (expire after 5 minutes)
-//	    cache.Set(ctx, "issue:"+issueID, serialize(issue), 5*time.Minute)
-//
-//	    return issue, nil
-//	}
-//
+
+
 // WHY USE TTL (Time To Live)?
 // Data becomes stale. If someone updates issue #123, the cached version
 // is now outdated. TTL ensures cached data is refreshed periodically.

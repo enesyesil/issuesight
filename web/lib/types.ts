@@ -2,44 +2,27 @@
 
 export interface User {
     id: string;
-    name: string;
+    display_name: string;
     email: string;
     avatar_url: string;
-    plan: 'free' | 'pro';
 }
 
-export interface Concept {
-    slug: string;        // e.g., "message-queues"
-    name: string;        // e.g., "Message Queues"
-    description: string; // Brief explanation
-}
+export interface AuthenticatedUser extends User { }
 
 export interface Tutorial {
     id: string;
     title: string;
-    repo: string;
-    issue_number: number;
-    status: 'PENDING' | 'COMPLETED' | 'FAILED';
     markdown_body: string;
-    concepts: Concept[];
+    status: string; // 'pending' | 'completed' | 'failed'
     created_at: string;
-    read_time?: number;
+    updated_at: string;
 }
 
-export interface TutorialListItem {
-    id: string;
-    title: string;
-    repo: string;
-    issue_number: number;
-    status: 'PENDING' | 'COMPLETED' | 'FAILED';
-    created_at: string;
-    description?: string;
-}
+export interface TutorialListItem extends Tutorial { }
 
-export interface QuotaInfo {
-    used: number;
-    limit: number;
-    resets_at: string;
+export interface TutorialListResponse {
+    tutorials: Tutorial[];
+    count: number;
 }
 
 export interface IssueSubmitRequest {
@@ -54,4 +37,10 @@ export interface IssueSubmitResponse {
 export interface ApiError {
     error: string;
     message: string;
+}
+
+export interface QuotaInfo {
+    used: number;
+    limit: number;
+    resets_at: string;
 }

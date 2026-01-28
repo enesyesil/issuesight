@@ -69,9 +69,26 @@ func NewServer(cfg ServerConfig, deps ServerDeps) *http.Server {
 	// Register routes
 	registerRoutes(mux, deps)
 
-	// Apply middleware chain: Recovery -> Logging -> Handler
+	// Initialize Rate Limiter (e.g., 60 requests per minute)
+	rateLimiter := middleware.NewRateLimiter(deps.Redis, 60, time.Minute)
+
+	// Initialize CSRF Protection
+	csrf := middleware.NewCSRF()
+
+	// Apply middleware chain: Recovery -> SecurityHeaders -> Logging -> RateLimit -> CSRF -> Handler
+	// Order matters! Security headers should be outer-most (after recovery), CSRF inner-most (closest to handler).
+	// Actually typical order: Recovery -> Logger -> Security -> ... -> Handler
+
 	var finalHandler http.Handler = mux
+
+	// Inner middlewares
+	finalHandler = csrf.Protect(finalHandler)
+	finalHandler = rateLimiter.Limit(finalHandler)
+
+	// Outer middlewares
 	finalHandler = middleware.Logging(finalHandler)
+	finalHandler = middleware.SecurityHeaders(finalHandler) // Add security headers
+	finalHandler = middleware.CORS(finalHandler)            // Add CORS headers
 	finalHandler = middleware.Recovery(finalHandler)
 
 	return &http.Server{

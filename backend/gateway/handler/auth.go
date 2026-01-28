@@ -128,7 +128,7 @@ func (h *AuthHandler) Google() http.HandlerFunc {
 // @Tags         auth
 // @Param        state  query     string  true  "OAuth state"
 // @Param        code   query     string  true  "OAuth code"
-// @Success      200    {object}  AuthTokenResponse
+// @Success      200    {object}  AuthUserResponse
 // @Failure      400    {object}  ErrorResponse
 // @Failure      500    {object}  ErrorResponse
 // @Router       /auth/callback [get]
@@ -181,17 +181,20 @@ func (h *AuthHandler) Callback() http.HandlerFunc {
 			return
 		}
 
-		// Return token to client
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(AuthTokenResponse{
-			Token: jwtToken,
-			User: AuthUserResponse{
-				ID:          user.ID.String(),
-				Email:       user.Email,
-				DisplayName: user.DisplayName,
-				AvatarURL:   user.AvatarURL,
-			},
+		// Set HttpOnly Cookie
+		http.SetCookie(w, &http.Cookie{
+			Name:     "auth_token",
+			Value:    jwtToken,
+			Path:     "/",
+			HttpOnly: true,
+			// Secure:   true, // TODO: Enable in production (requires TLS)
+			SameSite: http.SameSiteLaxMode,
+			MaxAge:   24 * 60 * 60, // 24 hours
 		})
+
+		// Redirect to Frontend Dashboard
+		// TODO: Get frontend URL from config
+		http.Redirect(w, r, "http://localhost:3000/dashboard/issues", http.StatusTemporaryRedirect)
 	}
 }
 
@@ -203,8 +206,15 @@ func (h *AuthHandler) Callback() http.HandlerFunc {
 // @Router       /auth/logout [post]
 func (h *AuthHandler) Logout() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// For JWT-based auth, logout is primarily client-side (discard token)
-		// Server can optionally maintain a token blacklist in Redis
+		// Clear the cookie
+		http.SetCookie(w, &http.Cookie{
+			Name:     "auth_token",
+			Value:    "",
+			Path:     "/",
+			HttpOnly: true,
+			MaxAge:   -1,
+		})
+
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(LogoutResponse{
 			Status:  "logged_out",
@@ -224,23 +234,37 @@ func (h *AuthHandler) Logout() http.HandlerFunc {
 // @Router       /auth/me [get]
 func (h *AuthHandler) Me() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Get authorization header
-		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" {
-			writeError(w, http.StatusUnauthorized, "missing_token", "Authorization header required")
-			return
+		var tokenString string
+
+		// 1. Try to get from Cookie
+		cookie, err := r.Cookie("auth_token")
+		if err == nil {
+			tokenString = cookie.Value
 		}
 
-		// Extract token
-		if len(authHeader) < 8 || authHeader[:7] != "Bearer " {
-			writeError(w, http.StatusUnauthorized, "invalid_token", "Invalid authorization header")
+		// 2. Fallback to Authorization Header (for API clients/testing)
+		if tokenString == "" {
+			authHeader := r.Header.Get("Authorization")
+			if authHeader != "" && len(authHeader) > 7 && authHeader[:7] == "Bearer " {
+				tokenString = authHeader[7:]
+			}
+		}
+
+		if tokenString == "" {
+			writeError(w, http.StatusUnauthorized, "missing_token", "Authentication required")
 			return
 		}
-		tokenString := authHeader[7:]
 
 		// Validate token
 		claims, err := h.sessionManager.ValidateToken(tokenString)
 		if err != nil {
+			// If cookie is invalid, clear it
+			http.SetCookie(w, &http.Cookie{
+				Name:   "auth_token",
+				Value:  "",
+				Path:   "/",
+				MaxAge: -1,
+			})
 			writeError(w, http.StatusUnauthorized, "invalid_token", "Token is invalid or expired")
 			return
 		}

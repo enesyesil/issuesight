@@ -1,33 +1,22 @@
-import React from 'react';
-import clsx from 'clsx';
-import styles from './Input.module.css';
+import * as React from "react"
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    label?: string;
-    error?: string;
-    icon?: React.ReactNode;
-    fullWidth?: boolean;
-}
+import { cn } from "@/lib/utils"
 
-export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ label, error, icon, fullWidth = true, className, ...props }, ref) => {
-        return (
-            <div className={clsx(styles.wrapper, fullWidth && styles.fullWidth)}>
-                {label && <label className={styles.label}>{label}</label>}
-                <div className={clsx(styles.inputWrapper, error && styles.hasError)}>
-                    {icon && <span className={styles.icon}>{icon}</span>}
-                    <input
-                        ref={ref}
-                        className={clsx(styles.input, icon && styles.hasIcon, className)}
-                        {...props}
-                    />
-                </div>
-                {error && <span className={styles.error}>{error}</span>}
-            </div>
-        );
-    }
-);
+const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
+  ({ className, type, ...props }, ref) => {
+    return (
+      <input
+        type={type}
+        className={cn(
+          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Input.displayName = "Input"
 
-Input.displayName = 'Input';
-
-export default Input;
+export { Input }
