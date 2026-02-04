@@ -193,7 +193,12 @@ func (l *redisLock) Release(ctx context.Context) error {
 	}
 
 	// result is 0 if we didn't own the lock (someone else had it)
-	if result.(int64) == 0 {
+	// Use safe type assertion to avoid panic on unexpected response type
+	deleted, ok := result.(int64)
+	if !ok {
+		return fmt.Errorf("failed to release lock %s: unexpected result type %T", l.key, result)
+	}
+	if deleted == 0 {
 		return ErrLockNotHeld
 	}
 
@@ -233,7 +238,12 @@ func (l *redisLock) Extend(ctx context.Context, ttl time.Duration) error {
 	}
 
 	// 0 means we don't own the lock anymore
-	if result.(int64) == 0 {
+	// Use safe type assertion to avoid panic on unexpected response type
+	extended, ok := result.(int64)
+	if !ok {
+		return fmt.Errorf("failed to extend lock %s: unexpected result type %T", l.key, result)
+	}
+	if extended == 0 {
 		return ErrLockNotHeld
 	}
 

@@ -55,6 +55,8 @@ type ConceptMutation struct {
 	slug                     *string
 	name                     *string
 	description              *string
+	category                 *string
+	tutorial_markdown        *string
 	clearedFields            map[string]struct{}
 	projects                 map[uuid.UUID]struct{}
 	removedprojects          map[uuid.UUID]struct{}
@@ -296,6 +298,104 @@ func (m *ConceptMutation) DescriptionCleared() bool {
 func (m *ConceptMutation) ResetDescription() {
 	m.description = nil
 	delete(m.clearedFields, concept.FieldDescription)
+}
+
+// SetCategory sets the "category" field.
+func (m *ConceptMutation) SetCategory(s string) {
+	m.category = &s
+}
+
+// Category returns the value of the "category" field in the mutation.
+func (m *ConceptMutation) Category() (r string, exists bool) {
+	v := m.category
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCategory returns the old "category" field's value of the Concept entity.
+// If the Concept object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConceptMutation) OldCategory(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCategory is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCategory requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCategory: %w", err)
+	}
+	return oldValue.Category, nil
+}
+
+// ClearCategory clears the value of the "category" field.
+func (m *ConceptMutation) ClearCategory() {
+	m.category = nil
+	m.clearedFields[concept.FieldCategory] = struct{}{}
+}
+
+// CategoryCleared returns if the "category" field was cleared in this mutation.
+func (m *ConceptMutation) CategoryCleared() bool {
+	_, ok := m.clearedFields[concept.FieldCategory]
+	return ok
+}
+
+// ResetCategory resets all changes to the "category" field.
+func (m *ConceptMutation) ResetCategory() {
+	m.category = nil
+	delete(m.clearedFields, concept.FieldCategory)
+}
+
+// SetTutorialMarkdown sets the "tutorial_markdown" field.
+func (m *ConceptMutation) SetTutorialMarkdown(s string) {
+	m.tutorial_markdown = &s
+}
+
+// TutorialMarkdown returns the value of the "tutorial_markdown" field in the mutation.
+func (m *ConceptMutation) TutorialMarkdown() (r string, exists bool) {
+	v := m.tutorial_markdown
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTutorialMarkdown returns the old "tutorial_markdown" field's value of the Concept entity.
+// If the Concept object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConceptMutation) OldTutorialMarkdown(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTutorialMarkdown is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTutorialMarkdown requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTutorialMarkdown: %w", err)
+	}
+	return oldValue.TutorialMarkdown, nil
+}
+
+// ClearTutorialMarkdown clears the value of the "tutorial_markdown" field.
+func (m *ConceptMutation) ClearTutorialMarkdown() {
+	m.tutorial_markdown = nil
+	m.clearedFields[concept.FieldTutorialMarkdown] = struct{}{}
+}
+
+// TutorialMarkdownCleared returns if the "tutorial_markdown" field was cleared in this mutation.
+func (m *ConceptMutation) TutorialMarkdownCleared() bool {
+	_, ok := m.clearedFields[concept.FieldTutorialMarkdown]
+	return ok
+}
+
+// ResetTutorialMarkdown resets all changes to the "tutorial_markdown" field.
+func (m *ConceptMutation) ResetTutorialMarkdown() {
+	m.tutorial_markdown = nil
+	delete(m.clearedFields, concept.FieldTutorialMarkdown)
 }
 
 // AddProjectIDs adds the "projects" edge to the Project entity by ids.
@@ -548,7 +648,7 @@ func (m *ConceptMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ConceptMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 5)
 	if m.slug != nil {
 		fields = append(fields, concept.FieldSlug)
 	}
@@ -557,6 +657,12 @@ func (m *ConceptMutation) Fields() []string {
 	}
 	if m.description != nil {
 		fields = append(fields, concept.FieldDescription)
+	}
+	if m.category != nil {
+		fields = append(fields, concept.FieldCategory)
+	}
+	if m.tutorial_markdown != nil {
+		fields = append(fields, concept.FieldTutorialMarkdown)
 	}
 	return fields
 }
@@ -572,6 +678,10 @@ func (m *ConceptMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case concept.FieldDescription:
 		return m.Description()
+	case concept.FieldCategory:
+		return m.Category()
+	case concept.FieldTutorialMarkdown:
+		return m.TutorialMarkdown()
 	}
 	return nil, false
 }
@@ -587,6 +697,10 @@ func (m *ConceptMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldName(ctx)
 	case concept.FieldDescription:
 		return m.OldDescription(ctx)
+	case concept.FieldCategory:
+		return m.OldCategory(ctx)
+	case concept.FieldTutorialMarkdown:
+		return m.OldTutorialMarkdown(ctx)
 	}
 	return nil, fmt.Errorf("unknown Concept field %s", name)
 }
@@ -616,6 +730,20 @@ func (m *ConceptMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDescription(v)
+		return nil
+	case concept.FieldCategory:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCategory(v)
+		return nil
+	case concept.FieldTutorialMarkdown:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTutorialMarkdown(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Concept field %s", name)
@@ -650,6 +778,12 @@ func (m *ConceptMutation) ClearedFields() []string {
 	if m.FieldCleared(concept.FieldDescription) {
 		fields = append(fields, concept.FieldDescription)
 	}
+	if m.FieldCleared(concept.FieldCategory) {
+		fields = append(fields, concept.FieldCategory)
+	}
+	if m.FieldCleared(concept.FieldTutorialMarkdown) {
+		fields = append(fields, concept.FieldTutorialMarkdown)
+	}
 	return fields
 }
 
@@ -667,6 +801,12 @@ func (m *ConceptMutation) ClearField(name string) error {
 	case concept.FieldDescription:
 		m.ClearDescription()
 		return nil
+	case concept.FieldCategory:
+		m.ClearCategory()
+		return nil
+	case concept.FieldTutorialMarkdown:
+		m.ClearTutorialMarkdown()
+		return nil
 	}
 	return fmt.Errorf("unknown Concept nullable field %s", name)
 }
@@ -683,6 +823,12 @@ func (m *ConceptMutation) ResetField(name string) error {
 		return nil
 	case concept.FieldDescription:
 		m.ResetDescription()
+		return nil
+	case concept.FieldCategory:
+		m.ResetCategory()
+		return nil
+	case concept.FieldTutorialMarkdown:
+		m.ResetTutorialMarkdown()
 		return nil
 	}
 	return fmt.Errorf("unknown Concept field %s", name)

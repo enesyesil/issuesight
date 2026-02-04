@@ -26,6 +26,12 @@ func (Concept) Fields() []ent.Field {
 			NotEmpty(),
 		field.Text("description").
 			Optional(),
+		field.String("category").
+			Optional().
+			Comment("Concept category, e.g. project, language, framework"),
+		field.Text("tutorial_markdown").
+			Optional().
+			Comment("Beginner-friendly concept tutorial in markdown"),
 	}
 }
 

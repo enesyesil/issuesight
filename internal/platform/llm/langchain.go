@@ -6,6 +6,7 @@ import (
 
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/anthropic"
+	"github.com/tmc/langchaingo/llms/cohere"
 	"github.com/tmc/langchaingo/llms/googleai"
 	"github.com/tmc/langchaingo/llms/ollama"
 	"github.com/tmc/langchaingo/llms/openai"
@@ -51,6 +52,12 @@ func createModel(cfg Config) (llms.Model, error) {
 		return anthropic.New(
 			anthropic.WithToken(cfg.APIKey),
 			anthropic.WithModel(cfg.Model),
+		)
+
+	case "cohere":
+		return cohere.New(
+			cohere.WithToken(cfg.APIKey),
+			cohere.WithModel(cfg.Model),
 		)
 
 	case "ollama":

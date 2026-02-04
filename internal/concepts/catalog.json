@@ -1,0 +1,2544 @@
+[
+  {
+    "slug": "kubernetes-kubernetes",
+    "name": "Kubernetes",
+    "description": "Container orchestration platform.",
+    "category": "project",
+    "aliases": [
+      "kubernetes/kubernetes",
+      "kubernetes"
+    ],
+    "triggers": [
+      "Kubernetes",
+      "kubernetes",
+      "kubernetes/kubernetes"
+    ]
+  },
+  {
+    "slug": "torvalds-linux",
+    "name": "Linux Kernel",
+    "description": "Linux operating system kernel.",
+    "category": "project",
+    "aliases": [
+      "torvalds/linux",
+      "linux"
+    ],
+    "triggers": [
+      "Linux Kernel",
+      "linux",
+      "torvalds/linux"
+    ]
+  },
+  {
+    "slug": "moby-moby",
+    "name": "Moby",
+    "description": "Open-source container engine that powers Docker.",
+    "category": "project",
+    "aliases": [
+      "moby/moby",
+      "moby"
+    ],
+    "triggers": [
+      "Moby",
+      "moby",
+      "moby/moby"
+    ]
+  },
+  {
+    "slug": "docker-compose",
+    "name": "Docker Compose",
+    "description": "Tooling for defining multi-container Docker apps.",
+    "category": "project",
+    "aliases": [
+      "docker/compose",
+      "compose"
+    ],
+    "triggers": [
+      "Docker Compose",
+      "compose",
+      "docker/compose"
+    ]
+  },
+  {
+    "slug": "helm-helm",
+    "name": "Helm",
+    "description": "Package manager for Kubernetes.",
+    "category": "project",
+    "aliases": [
+      "helm/helm",
+      "helm"
+    ],
+    "triggers": [
+      "Helm",
+      "helm",
+      "helm/helm"
+    ]
+  },
+  {
+    "slug": "hashicorp-terraform",
+    "name": "Terraform",
+    "description": "Infrastructure as code tooling.",
+    "category": "project",
+    "aliases": [
+      "hashicorp/terraform",
+      "terraform"
+    ],
+    "triggers": [
+      "Terraform",
+      "terraform",
+      "hashicorp/terraform"
+    ]
+  },
+  {
+    "slug": "hashicorp-consul",
+    "name": "Consul",
+    "description": "Service discovery and configuration.",
+    "category": "project",
+    "aliases": [
+      "hashicorp/consul",
+      "consul"
+    ],
+    "triggers": [
+      "Consul",
+      "consul",
+      "hashicorp/consul"
+    ]
+  },
+  {
+    "slug": "hashicorp-vault",
+    "name": "Vault",
+    "description": "Secrets management and encryption.",
+    "category": "project",
+    "aliases": [
+      "hashicorp/vault",
+      "vault"
+    ],
+    "triggers": [
+      "Vault",
+      "vault",
+      "hashicorp/vault"
+    ]
+  },
+  {
+    "slug": "hashicorp-nomad",
+    "name": "Nomad",
+    "description": "Workload scheduler and orchestrator.",
+    "category": "project",
+    "aliases": [
+      "hashicorp/nomad",
+      "nomad"
+    ],
+    "triggers": [
+      "Nomad",
+      "nomad",
+      "hashicorp/nomad"
+    ]
+  },
+  {
+    "slug": "ansible-ansible",
+    "name": "Ansible",
+    "description": "IT automation and configuration management.",
+    "category": "project",
+    "aliases": [
+      "ansible/ansible",
+      "ansible"
+    ],
+    "triggers": [
+      "Ansible",
+      "ansible",
+      "ansible/ansible"
+    ]
+  },
+  {
+    "slug": "puppetlabs-puppet",
+    "name": "Puppet",
+    "description": "Infrastructure automation and configuration.",
+    "category": "project",
+    "aliases": [
+      "puppetlabs/puppet",
+      "puppet"
+    ],
+    "triggers": [
+      "Puppet",
+      "puppet",
+      "puppetlabs/puppet"
+    ]
+  },
+  {
+    "slug": "chef-chef",
+    "name": "Chef",
+    "description": "Configuration management and automation.",
+    "category": "project",
+    "aliases": [
+      "chef/chef",
+      "chef"
+    ],
+    "triggers": [
+      "Chef",
+      "chef",
+      "chef/chef"
+    ]
+  },
+  {
+    "slug": "saltstack-salt",
+    "name": "Salt",
+    "description": "Remote execution and configuration management.",
+    "category": "project",
+    "aliases": [
+      "saltstack/salt",
+      "salt"
+    ],
+    "triggers": [
+      "Salt",
+      "salt",
+      "saltstack/salt"
+    ]
+  },
+  {
+    "slug": "prometheus-prometheus",
+    "name": "Prometheus",
+    "description": "Monitoring and alerting system.",
+    "category": "project",
+    "aliases": [
+      "prometheus/prometheus",
+      "prometheus"
+    ],
+    "triggers": [
+      "Prometheus",
+      "prometheus",
+      "prometheus/prometheus"
+    ]
+  },
+  {
+    "slug": "grafana-grafana",
+    "name": "Grafana",
+    "description": "Metrics visualization and dashboards.",
+    "category": "project",
+    "aliases": [
+      "grafana/grafana",
+      "grafana"
+    ],
+    "triggers": [
+      "Grafana",
+      "grafana",
+      "grafana/grafana"
+    ]
+  },
+  {
+    "slug": "grafana-loki",
+    "name": "Loki",
+    "description": "Log aggregation system.",
+    "category": "project",
+    "aliases": [
+      "grafana/loki",
+      "loki"
+    ],
+    "triggers": [
+      "Loki",
+      "loki",
+      "grafana/loki"
+    ]
+  },
+  {
+    "slug": "grafana-tempo",
+    "name": "Tempo",
+    "description": "Distributed tracing backend.",
+    "category": "project",
+    "aliases": [
+      "grafana/tempo",
+      "tempo"
+    ],
+    "triggers": [
+      "Tempo",
+      "tempo",
+      "grafana/tempo"
+    ]
+  },
+  {
+    "slug": "envoyproxy-envoy",
+    "name": "Envoy",
+    "description": "High-performance proxy and service mesh.",
+    "category": "project",
+    "aliases": [
+      "envoyproxy/envoy",
+      "envoy"
+    ],
+    "triggers": [
+      "Envoy",
+      "envoy",
+      "envoyproxy/envoy"
+    ]
+  },
+  {
+    "slug": "istio-istio",
+    "name": "Istio",
+    "description": "Service mesh for microservices.",
+    "category": "project",
+    "aliases": [
+      "istio/istio",
+      "istio"
+    ],
+    "triggers": [
+      "Istio",
+      "istio",
+      "istio/istio"
+    ]
+  },
+  {
+    "slug": "traefik-traefik",
+    "name": "Traefik",
+    "description": "Cloud native reverse proxy and load balancer.",
+    "category": "project",
+    "aliases": [
+      "traefik/traefik",
+      "traefik"
+    ],
+    "triggers": [
+      "Traefik",
+      "traefik",
+      "traefik/traefik"
+    ]
+  },
+  {
+    "slug": "caddyserver-caddy",
+    "name": "Caddy",
+    "description": "Automatic HTTPS web server.",
+    "category": "project",
+    "aliases": [
+      "caddyserver/caddy",
+      "caddy"
+    ],
+    "triggers": [
+      "Caddy",
+      "caddy",
+      "caddyserver/caddy"
+    ]
+  },
+  {
+    "slug": "nginx-nginx",
+    "name": "Nginx",
+    "description": "High-performance web server and reverse proxy.",
+    "category": "project",
+    "aliases": [
+      "nginx/nginx",
+      "nginx"
+    ],
+    "triggers": [
+      "Nginx",
+      "nginx",
+      "nginx/nginx"
+    ]
+  },
+  {
+    "slug": "apache-httpd",
+    "name": "Apache HTTP Server",
+    "description": "Widely used open-source web server.",
+    "category": "project",
+    "aliases": [
+      "apache/httpd",
+      "httpd"
+    ],
+    "triggers": [
+      "Apache HTTP Server",
+      "httpd",
+      "apache/httpd"
+    ]
+  },
+  {
+    "slug": "openresty-openresty",
+    "name": "OpenResty",
+    "description": "Nginx-based web platform with Lua.",
+    "category": "project",
+    "aliases": [
+      "openresty/openresty",
+      "openresty"
+    ],
+    "triggers": [
+      "OpenResty",
+      "openresty",
+      "openresty/openresty"
+    ]
+  },
+  {
+    "slug": "etcd-io-etcd",
+    "name": "etcd",
+    "description": "Distributed key-value store for configuration.",
+    "category": "project",
+    "aliases": [
+      "etcd-io/etcd",
+      "etcd"
+    ],
+    "triggers": [
+      "etcd",
+      "etcd-io/etcd"
+    ]
+  },
+  {
+    "slug": "minio-minio",
+    "name": "MinIO",
+    "description": "S3-compatible object storage.",
+    "category": "project",
+    "aliases": [
+      "minio/minio",
+      "minio"
+    ],
+    "triggers": [
+      "MinIO",
+      "minio",
+      "minio/minio"
+    ]
+  },
+  {
+    "slug": "pulumi-pulumi",
+    "name": "Pulumi",
+    "description": "Infrastructure as code with programming languages.",
+    "category": "project",
+    "aliases": [
+      "pulumi/pulumi",
+      "pulumi"
+    ],
+    "triggers": [
+      "Pulumi",
+      "pulumi",
+      "pulumi/pulumi"
+    ]
+  },
+  {
+    "slug": "openfaas-faas",
+    "name": "OpenFaaS",
+    "description": "Functions as a Service platform.",
+    "category": "project",
+    "aliases": [
+      "openfaas/faas",
+      "faas"
+    ],
+    "triggers": [
+      "OpenFaaS",
+      "faas",
+      "openfaas/faas"
+    ]
+  },
+  {
+    "slug": "knative-serving",
+    "name": "Knative Serving",
+    "description": "Serverless workloads on Kubernetes.",
+    "category": "project",
+    "aliases": [
+      "knative/serving",
+      "serving"
+    ],
+    "triggers": [
+      "Knative Serving",
+      "serving",
+      "knative/serving"
+    ]
+  },
+  {
+    "slug": "open-policy-agent-opa",
+    "name": "Open Policy Agent",
+    "description": "Policy-based control for cloud services.",
+    "category": "project",
+    "aliases": [
+      "open-policy-agent/opa",
+      "opa"
+    ],
+    "triggers": [
+      "Open Policy Agent",
+      "opa",
+      "open-policy-agent/opa"
+    ]
+  },
+  {
+    "slug": "keycloak-keycloak",
+    "name": "Keycloak",
+    "description": "Identity and access management.",
+    "category": "project",
+    "aliases": [
+      "keycloak/keycloak",
+      "keycloak"
+    ],
+    "triggers": [
+      "Keycloak",
+      "keycloak",
+      "keycloak/keycloak"
+    ]
+  },
+  {
+    "slug": "gitea-gitea",
+    "name": "Gitea",
+    "description": "Self-hosted Git service.",
+    "category": "project",
+    "aliases": [
+      "gitea/gitea",
+      "gitea"
+    ],
+    "triggers": [
+      "Gitea",
+      "gitea",
+      "gitea/gitea"
+    ]
+  },
+  {
+    "slug": "jenkinsci-jenkins",
+    "name": "Jenkins",
+    "description": "Automation server for CI/CD.",
+    "category": "project",
+    "aliases": [
+      "jenkinsci/jenkins",
+      "jenkins"
+    ],
+    "triggers": [
+      "Jenkins",
+      "jenkins",
+      "jenkinsci/jenkins"
+    ]
+  },
+  {
+    "slug": "git-git",
+    "name": "Git",
+    "description": "Distributed version control system.",
+    "category": "project",
+    "aliases": [
+      "git/git",
+      "git"
+    ],
+    "triggers": [
+      "Git",
+      "git",
+      "git/git"
+    ]
+  },
+  {
+    "slug": "gitlab-org-gitlab",
+    "name": "GitLab",
+    "description": "DevOps platform and Git repository manager.",
+    "category": "project",
+    "aliases": [
+      "gitlab-org/gitlab",
+      "gitlab"
+    ],
+    "triggers": [
+      "GitLab",
+      "gitlab",
+      "gitlab-org/gitlab"
+    ]
+  },
+  {
+    "slug": "redis-redis",
+    "name": "Redis",
+    "description": "In-memory data store.",
+    "category": "project",
+    "aliases": [
+      "redis/redis",
+      "redis"
+    ],
+    "triggers": [
+      "Redis",
+      "redis",
+      "redis/redis"
+    ]
+  },
+  {
+    "slug": "mongodb-mongo",
+    "name": "MongoDB",
+    "description": "Document-oriented database.",
+    "category": "project",
+    "aliases": [
+      "mongodb/mongo",
+      "mongo"
+    ],
+    "triggers": [
+      "MongoDB",
+      "mongo",
+      "mongodb/mongo"
+    ]
+  },
+  {
+    "slug": "postgres-postgres",
+    "name": "PostgreSQL",
+    "description": "Relational database.",
+    "category": "project",
+    "aliases": [
+      "postgres/postgres",
+      "postgres"
+    ],
+    "triggers": [
+      "PostgreSQL",
+      "postgres",
+      "postgres/postgres"
+    ]
+  },
+  {
+    "slug": "mysql-mysql-server",
+    "name": "MySQL",
+    "description": "Relational database.",
+    "category": "project",
+    "aliases": [
+      "mysql/mysql-server",
+      "mysql-server"
+    ],
+    "triggers": [
+      "MySQL",
+      "mysql-server",
+      "mysql/mysql-server"
+    ]
+  },
+  {
+    "slug": "mariadb-server",
+    "name": "MariaDB",
+    "description": "Open-source relational database.",
+    "category": "project",
+    "aliases": [
+      "mariadb/server",
+      "server"
+    ],
+    "triggers": [
+      "MariaDB",
+      "server",
+      "mariadb/server"
+    ]
+  },
+  {
+    "slug": "sqlite-sqlite",
+    "name": "SQLite",
+    "description": "Lightweight embedded database.",
+    "category": "project",
+    "aliases": [
+      "sqlite/sqlite",
+      "sqlite"
+    ],
+    "triggers": [
+      "SQLite",
+      "sqlite",
+      "sqlite/sqlite"
+    ]
+  },
+  {
+    "slug": "cockroachdb-cockroach",
+    "name": "CockroachDB",
+    "description": "Distributed SQL database.",
+    "category": "project",
+    "aliases": [
+      "cockroachdb/cockroach",
+      "cockroach"
+    ],
+    "triggers": [
+      "CockroachDB",
+      "cockroach",
+      "cockroachdb/cockroach"
+    ]
+  },
+  {
+    "slug": "elastic-elasticsearch",
+    "name": "Elasticsearch",
+    "description": "Search and analytics engine.",
+    "category": "project",
+    "aliases": [
+      "elastic/elasticsearch",
+      "elasticsearch"
+    ],
+    "triggers": [
+      "Elasticsearch",
+      "elasticsearch",
+      "elastic/elasticsearch"
+    ]
+  },
+  {
+    "slug": "opensearch-project-opensearch",
+    "name": "OpenSearch",
+    "description": "Open-source search and analytics.",
+    "category": "project",
+    "aliases": [
+      "opensearch-project/opensearch",
+      "opensearch"
+    ],
+    "triggers": [
+      "OpenSearch",
+      "opensearch",
+      "opensearch-project/opensearch"
+    ]
+  },
+  {
+    "slug": "apache-cassandra",
+    "name": "Apache Cassandra",
+    "description": "Distributed wide-column database.",
+    "category": "project",
+    "aliases": [
+      "apache/cassandra",
+      "cassandra"
+    ],
+    "triggers": [
+      "Apache Cassandra",
+      "cassandra",
+      "apache/cassandra"
+    ]
+  },
+  {
+    "slug": "apache-hadoop",
+    "name": "Apache Hadoop",
+    "description": "Distributed storage and processing.",
+    "category": "project",
+    "aliases": [
+      "apache/hadoop",
+      "hadoop"
+    ],
+    "triggers": [
+      "Apache Hadoop",
+      "hadoop",
+      "apache/hadoop"
+    ]
+  },
+  {
+    "slug": "apache-spark",
+    "name": "Apache Spark",
+    "description": "Distributed data processing engine.",
+    "category": "project",
+    "aliases": [
+      "apache/spark",
+      "spark"
+    ],
+    "triggers": [
+      "Apache Spark",
+      "spark",
+      "apache/spark"
+    ]
+  },
+  {
+    "slug": "apache-kafka",
+    "name": "Apache Kafka",
+    "description": "Distributed event streaming platform.",
+    "category": "project",
+    "aliases": [
+      "apache/kafka",
+      "kafka"
+    ],
+    "triggers": [
+      "Apache Kafka",
+      "kafka",
+      "apache/kafka"
+    ]
+  },
+  {
+    "slug": "apache-flink",
+    "name": "Apache Flink",
+    "description": "Stream and batch processing engine.",
+    "category": "project",
+    "aliases": [
+      "apache/flink",
+      "flink"
+    ],
+    "triggers": [
+      "Apache Flink",
+      "flink",
+      "apache/flink"
+    ]
+  },
+  {
+    "slug": "apache-airflow",
+    "name": "Apache Airflow",
+    "description": "Workflow orchestration platform.",
+    "category": "project",
+    "aliases": [
+      "apache/airflow",
+      "airflow"
+    ],
+    "triggers": [
+      "Apache Airflow",
+      "airflow",
+      "apache/airflow"
+    ]
+  },
+  {
+    "slug": "apache-superset",
+    "name": "Apache Superset",
+    "description": "Data exploration and visualization.",
+    "category": "project",
+    "aliases": [
+      "apache/superset",
+      "superset"
+    ],
+    "triggers": [
+      "Apache Superset",
+      "superset",
+      "apache/superset"
+    ]
+  },
+  {
+    "slug": "apache-iceberg",
+    "name": "Apache Iceberg",
+    "description": "Table format for large datasets.",
+    "category": "project",
+    "aliases": [
+      "apache/iceberg",
+      "iceberg"
+    ],
+    "triggers": [
+      "Apache Iceberg",
+      "iceberg",
+      "apache/iceberg"
+    ]
+  },
+  {
+    "slug": "apache-arrow",
+    "name": "Apache Arrow",
+    "description": "In-memory columnar data format.",
+    "category": "project",
+    "aliases": [
+      "apache/arrow",
+      "arrow"
+    ],
+    "triggers": [
+      "Apache Arrow",
+      "arrow",
+      "apache/arrow"
+    ]
+  },
+  {
+    "slug": "apache-hive",
+    "name": "Apache Hive",
+    "description": "Data warehouse software.",
+    "category": "project",
+    "aliases": [
+      "apache/hive",
+      "hive"
+    ],
+    "triggers": [
+      "Apache Hive",
+      "hive",
+      "apache/hive"
+    ]
+  },
+  {
+    "slug": "apache-zookeeper",
+    "name": "Apache ZooKeeper",
+    "description": "Distributed coordination service.",
+    "category": "project",
+    "aliases": [
+      "apache/zookeeper",
+      "zookeeper"
+    ],
+    "triggers": [
+      "Apache ZooKeeper",
+      "zookeeper",
+      "apache/zookeeper"
+    ]
+  },
+  {
+    "slug": "clickhouse-clickhouse",
+    "name": "ClickHouse",
+    "description": "Columnar OLAP database.",
+    "category": "project",
+    "aliases": [
+      "clickhouse/clickhouse",
+      "clickhouse"
+    ],
+    "triggers": [
+      "ClickHouse",
+      "clickhouse",
+      "clickhouse/clickhouse"
+    ]
+  },
+  {
+    "slug": "rabbitmq-rabbitmq-server",
+    "name": "RabbitMQ",
+    "description": "Message broker for queues.",
+    "category": "project",
+    "aliases": [
+      "rabbitmq/rabbitmq-server",
+      "rabbitmq-server"
+    ],
+    "triggers": [
+      "RabbitMQ",
+      "rabbitmq-server",
+      "rabbitmq/rabbitmq-server"
+    ]
+  },
+  {
+    "slug": "redpanda-data-redpanda",
+    "name": "Redpanda",
+    "description": "Kafka-compatible streaming platform.",
+    "category": "project",
+    "aliases": [
+      "redpanda-data/redpanda",
+      "redpanda"
+    ],
+    "triggers": [
+      "Redpanda",
+      "redpanda",
+      "redpanda-data/redpanda"
+    ]
+  },
+  {
+    "slug": "influxdata-influxdb",
+    "name": "InfluxDB",
+    "description": "Time series database.",
+    "category": "project",
+    "aliases": [
+      "influxdata/influxdb",
+      "influxdb"
+    ],
+    "triggers": [
+      "InfluxDB",
+      "influxdb",
+      "influxdata/influxdb"
+    ]
+  },
+  {
+    "slug": "timescale-timescaledb",
+    "name": "TimescaleDB",
+    "description": "PostgreSQL-based time series database.",
+    "category": "project",
+    "aliases": [
+      "timescale/timescaledb",
+      "timescaledb"
+    ],
+    "triggers": [
+      "TimescaleDB",
+      "timescaledb",
+      "timescale/timescaledb"
+    ]
+  },
+  {
+    "slug": "apache-druid",
+    "name": "Apache Druid",
+    "description": "Real-time analytics database.",
+    "category": "project",
+    "aliases": [
+      "apache/druid",
+      "druid"
+    ],
+    "triggers": [
+      "Apache Druid",
+      "druid",
+      "apache/druid"
+    ]
+  },
+  {
+    "slug": "apache-solr",
+    "name": "Apache Solr",
+    "description": "Enterprise search platform.",
+    "category": "project",
+    "aliases": [
+      "apache/solr",
+      "solr"
+    ],
+    "triggers": [
+      "Apache Solr",
+      "solr",
+      "apache/solr"
+    ]
+  },
+  {
+    "slug": "elastic-kibana",
+    "name": "Kibana",
+    "description": "Visualization layer for Elasticsearch.",
+    "category": "project",
+    "aliases": [
+      "elastic/kibana",
+      "kibana"
+    ],
+    "triggers": [
+      "Kibana",
+      "kibana",
+      "elastic/kibana"
+    ]
+  },
+  {
+    "slug": "jaegertracing-jaeger",
+    "name": "Jaeger",
+    "description": "Distributed tracing system.",
+    "category": "project",
+    "aliases": [
+      "jaegertracing/jaeger",
+      "jaeger"
+    ],
+    "triggers": [
+      "Jaeger",
+      "jaeger",
+      "jaegertracing/jaeger"
+    ]
+  },
+  {
+    "slug": "open-telemetry-opentelemetry-collector",
+    "name": "OpenTelemetry Collector",
+    "description": "Telemetry data collector.",
+    "category": "project",
+    "aliases": [
+      "open-telemetry/opentelemetry-collector",
+      "opentelemetry-collector"
+    ],
+    "triggers": [
+      "OpenTelemetry Collector",
+      "opentelemetry-collector",
+      "open-telemetry/opentelemetry-collector"
+    ]
+  },
+  {
+    "slug": "grpc-grpc",
+    "name": "gRPC",
+    "description": "High-performance RPC framework.",
+    "category": "project",
+    "aliases": [
+      "grpc/grpc",
+      "grpc"
+    ],
+    "triggers": [
+      "gRPC",
+      "grpc",
+      "grpc/grpc"
+    ]
+  },
+  {
+    "slug": "protocolbuffers-protobuf",
+    "name": "Protocol Buffers",
+    "description": "Language-neutral data serialization.",
+    "category": "project",
+    "aliases": [
+      "protocolbuffers/protobuf",
+      "protobuf"
+    ],
+    "triggers": [
+      "Protocol Buffers",
+      "protobuf",
+      "protocolbuffers/protobuf"
+    ]
+  },
+  {
+    "slug": "tensorflow-tensorflow",
+    "name": "TensorFlow",
+    "description": "Machine learning framework.",
+    "category": "project",
+    "aliases": [
+      "tensorflow/tensorflow",
+      "tensorflow"
+    ],
+    "triggers": [
+      "TensorFlow",
+      "tensorflow",
+      "tensorflow/tensorflow"
+    ]
+  },
+  {
+    "slug": "pytorch-pytorch",
+    "name": "PyTorch",
+    "description": "Machine learning framework.",
+    "category": "project",
+    "aliases": [
+      "pytorch/pytorch",
+      "pytorch"
+    ],
+    "triggers": [
+      "PyTorch",
+      "pytorch",
+      "pytorch/pytorch"
+    ]
+  },
+  {
+    "slug": "scikit-learn-scikit-learn",
+    "name": "scikit-learn",
+    "description": "Machine learning in Python.",
+    "category": "project",
+    "aliases": [
+      "scikit-learn/scikit-learn",
+      "scikit-learn"
+    ],
+    "triggers": [
+      "scikit-learn",
+      "scikit-learn/scikit-learn"
+    ]
+  },
+  {
+    "slug": "keras-team-keras",
+    "name": "Keras",
+    "description": "High-level neural networks API.",
+    "category": "project",
+    "aliases": [
+      "keras-team/keras",
+      "keras"
+    ],
+    "triggers": [
+      "Keras",
+      "keras",
+      "keras-team/keras"
+    ]
+  },
+  {
+    "slug": "microsoft-vscode",
+    "name": "Visual Studio Code",
+    "description": "Source code editor.",
+    "category": "project",
+    "aliases": [
+      "microsoft/vscode",
+      "vscode"
+    ],
+    "triggers": [
+      "Visual Studio Code",
+      "vscode",
+      "microsoft/vscode"
+    ]
+  },
+  {
+    "slug": "microsoft-typescript",
+    "name": "TypeScript",
+    "description": "Typed superset of JavaScript.",
+    "category": "project",
+    "aliases": [
+      "microsoft/TypeScript",
+      "TypeScript"
+    ],
+    "triggers": [
+      "TypeScript",
+      "microsoft/TypeScript"
+    ]
+  },
+  {
+    "slug": "flutter-flutter",
+    "name": "Flutter",
+    "description": "UI toolkit for building apps.",
+    "category": "project",
+    "aliases": [
+      "flutter/flutter",
+      "flutter"
+    ],
+    "triggers": [
+      "Flutter",
+      "flutter",
+      "flutter/flutter"
+    ]
+  },
+  {
+    "slug": "electron-electron",
+    "name": "Electron",
+    "description": "Desktop apps with web technologies.",
+    "category": "project",
+    "aliases": [
+      "electron/electron",
+      "electron"
+    ],
+    "triggers": [
+      "Electron",
+      "electron",
+      "electron/electron"
+    ]
+  },
+  {
+    "slug": "facebook-react",
+    "name": "React",
+    "description": "JavaScript UI library.",
+    "category": "project",
+    "aliases": [
+      "facebook/react",
+      "react"
+    ],
+    "triggers": [
+      "React",
+      "react",
+      "facebook/react"
+    ]
+  },
+  {
+    "slug": "vuejs-vue",
+    "name": "Vue.js",
+    "description": "Progressive JavaScript framework.",
+    "category": "project",
+    "aliases": [
+      "vuejs/vue",
+      "vue"
+    ],
+    "triggers": [
+      "Vue.js",
+      "vue",
+      "vuejs/vue"
+    ]
+  },
+  {
+    "slug": "angular-angular",
+    "name": "Angular",
+    "description": "Web application framework.",
+    "category": "project",
+    "aliases": [
+      "angular/angular",
+      "angular"
+    ],
+    "triggers": [
+      "Angular",
+      "angular",
+      "angular/angular"
+    ]
+  },
+  {
+    "slug": "sveltejs-svelte",
+    "name": "Svelte",
+    "description": "Compiler-based UI framework.",
+    "category": "project",
+    "aliases": [
+      "sveltejs/svelte",
+      "svelte"
+    ],
+    "triggers": [
+      "Svelte",
+      "svelte",
+      "sveltejs/svelte"
+    ]
+  },
+  {
+    "slug": "vercel-next-js",
+    "name": "Next.js",
+    "description": "React framework for production.",
+    "category": "project",
+    "aliases": [
+      "vercel/next.js",
+      "next.js"
+    ],
+    "triggers": [
+      "Next.js",
+      "next.js",
+      "vercel/next.js"
+    ]
+  },
+  {
+    "slug": "nuxt-nuxt",
+    "name": "Nuxt",
+    "description": "Vue framework for production.",
+    "category": "project",
+    "aliases": [
+      "nuxt/nuxt",
+      "nuxt"
+    ],
+    "triggers": [
+      "Nuxt",
+      "nuxt",
+      "nuxt/nuxt"
+    ]
+  },
+  {
+    "slug": "remix-run-remix",
+    "name": "Remix",
+    "description": "Full stack web framework.",
+    "category": "project",
+    "aliases": [
+      "remix-run/remix",
+      "remix"
+    ],
+    "triggers": [
+      "Remix",
+      "remix",
+      "remix-run/remix"
+    ]
+  },
+  {
+    "slug": "expressjs-express",
+    "name": "Express",
+    "description": "Minimal Node.js web framework.",
+    "category": "project",
+    "aliases": [
+      "expressjs/express",
+      "express"
+    ],
+    "triggers": [
+      "Express",
+      "express",
+      "expressjs/express"
+    ]
+  },
+  {
+    "slug": "nestjs-nest",
+    "name": "NestJS",
+    "description": "Progressive Node.js framework.",
+    "category": "project",
+    "aliases": [
+      "nestjs/nest",
+      "nest"
+    ],
+    "triggers": [
+      "NestJS",
+      "nest",
+      "nestjs/nest"
+    ]
+  },
+  {
+    "slug": "django-django",
+    "name": "Django",
+    "description": "Python web framework.",
+    "category": "project",
+    "aliases": [
+      "django/django",
+      "django"
+    ],
+    "triggers": [
+      "Django",
+      "django",
+      "django/django"
+    ]
+  },
+  {
+    "slug": "pallets-flask",
+    "name": "Flask",
+    "description": "Micro web framework for Python.",
+    "category": "project",
+    "aliases": [
+      "pallets/flask",
+      "flask"
+    ],
+    "triggers": [
+      "Flask",
+      "flask",
+      "pallets/flask"
+    ]
+  },
+  {
+    "slug": "fastapi-fastapi",
+    "name": "FastAPI",
+    "description": "Modern Python web framework.",
+    "category": "project",
+    "aliases": [
+      "fastapi/fastapi",
+      "fastapi"
+    ],
+    "triggers": [
+      "FastAPI",
+      "fastapi",
+      "fastapi/fastapi"
+    ]
+  },
+  {
+    "slug": "rails-rails",
+    "name": "Ruby on Rails",
+    "description": "Web application framework for Ruby.",
+    "category": "project",
+    "aliases": [
+      "rails/rails",
+      "rails"
+    ],
+    "triggers": [
+      "Ruby on Rails",
+      "rails",
+      "rails/rails"
+    ]
+  },
+  {
+    "slug": "laravel-laravel",
+    "name": "Laravel",
+    "description": "PHP web framework.",
+    "category": "project",
+    "aliases": [
+      "laravel/laravel",
+      "laravel"
+    ],
+    "triggers": [
+      "Laravel",
+      "laravel",
+      "laravel/laravel"
+    ]
+  },
+  {
+    "slug": "spring-projects-spring-boot",
+    "name": "Spring Boot",
+    "description": "Java application framework.",
+    "category": "project",
+    "aliases": [
+      "spring-projects/spring-boot",
+      "spring-boot"
+    ],
+    "triggers": [
+      "Spring Boot",
+      "spring-boot",
+      "spring-projects/spring-boot"
+    ]
+  },
+  {
+    "slug": "dotnet-aspnetcore",
+    "name": "ASP.NET Core",
+    "description": "Web framework for .NET.",
+    "category": "project",
+    "aliases": [
+      "dotnet/aspnetcore",
+      "aspnetcore"
+    ],
+    "triggers": [
+      "ASP.NET Core",
+      "aspnetcore",
+      "dotnet/aspnetcore"
+    ]
+  },
+  {
+    "slug": "nodejs-node",
+    "name": "Node.js",
+    "description": "JavaScript runtime.",
+    "category": "project",
+    "aliases": [
+      "nodejs/node",
+      "node"
+    ],
+    "triggers": [
+      "Node.js",
+      "node",
+      "nodejs/node"
+    ]
+  },
+  {
+    "slug": "denoland-deno",
+    "name": "Deno",
+    "description": "Secure JavaScript runtime.",
+    "category": "project",
+    "aliases": [
+      "denoland/deno",
+      "deno"
+    ],
+    "triggers": [
+      "Deno",
+      "deno",
+      "denoland/deno"
+    ]
+  },
+  {
+    "slug": "oven-sh-bun",
+    "name": "Bun",
+    "description": "JavaScript runtime and toolkit.",
+    "category": "project",
+    "aliases": [
+      "oven-sh/bun",
+      "bun"
+    ],
+    "triggers": [
+      "Bun",
+      "bun",
+      "oven-sh/bun"
+    ]
+  },
+  {
+    "slug": "golang-go",
+    "name": "Go",
+    "description": "Go programming language implementation.",
+    "category": "project",
+    "aliases": [
+      "golang/go",
+      "go"
+    ],
+    "triggers": [
+      "Go",
+      "go",
+      "golang/go"
+    ]
+  },
+  {
+    "slug": "rust-lang-rust",
+    "name": "Rust",
+    "description": "Rust programming language compiler.",
+    "category": "project",
+    "aliases": [
+      "rust-lang/rust",
+      "rust"
+    ],
+    "triggers": [
+      "Rust",
+      "rust",
+      "rust-lang/rust"
+    ]
+  },
+  {
+    "slug": "python-cpython",
+    "name": "CPython",
+    "description": "Python reference implementation.",
+    "category": "project",
+    "aliases": [
+      "python/cpython",
+      "cpython"
+    ],
+    "triggers": [
+      "CPython",
+      "cpython",
+      "python/cpython"
+    ]
+  },
+  {
+    "slug": "ruby-ruby",
+    "name": "Ruby",
+    "description": "Ruby programming language implementation.",
+    "category": "project",
+    "aliases": [
+      "ruby/ruby",
+      "ruby"
+    ],
+    "triggers": [
+      "Ruby",
+      "ruby",
+      "ruby/ruby"
+    ]
+  },
+  {
+    "slug": "php-php-src",
+    "name": "PHP",
+    "description": "PHP language source.",
+    "category": "project",
+    "aliases": [
+      "php/php-src",
+      "php-src"
+    ],
+    "triggers": [
+      "PHP",
+      "php-src",
+      "php/php-src"
+    ]
+  },
+  {
+    "slug": "kotlin-kotlin",
+    "name": "Kotlin",
+    "description": "Kotlin programming language.",
+    "category": "project",
+    "aliases": [
+      "kotlin/kotlin",
+      "kotlin"
+    ],
+    "triggers": [
+      "Kotlin",
+      "kotlin",
+      "kotlin/kotlin"
+    ]
+  },
+  {
+    "slug": "swiftlang-swift",
+    "name": "Swift",
+    "description": "Swift programming language.",
+    "category": "project",
+    "aliases": [
+      "swiftlang/swift",
+      "swift"
+    ],
+    "triggers": [
+      "Swift",
+      "swift",
+      "swiftlang/swift"
+    ]
+  },
+  {
+    "slug": "go",
+    "name": "Go",
+    "description": "Go programming language and ecosystem.",
+    "category": "language",
+    "aliases": [
+      "golang"
+    ],
+    "triggers": [
+      "go",
+      "golang"
+    ]
+  },
+  {
+    "slug": "python",
+    "name": "Python",
+    "description": "Python programming language and ecosystem.",
+    "category": "language",
+    "aliases": [
+      "cpython"
+    ],
+    "triggers": [
+      "python"
+    ]
+  },
+  {
+    "slug": "javascript",
+    "name": "JavaScript",
+    "description": "JavaScript language and runtime ecosystem.",
+    "category": "language",
+    "aliases": [
+      "js"
+    ],
+    "triggers": [
+      "javascript",
+      "js"
+    ]
+  },
+  {
+    "slug": "typescript",
+    "name": "TypeScript",
+    "description": "TypeScript language and tooling.",
+    "category": "language",
+    "aliases": [
+      "ts"
+    ],
+    "triggers": [
+      "typescript",
+      "ts"
+    ]
+  },
+  {
+    "slug": "java",
+    "name": "Java",
+    "description": "Java programming language and JVM ecosystem.",
+    "category": "language",
+    "aliases": [
+      "jvm"
+    ],
+    "triggers": [
+      "java",
+      "jvm"
+    ]
+  },
+  {
+    "slug": "c",
+    "name": "C",
+    "description": "C programming language.",
+    "category": "language",
+    "aliases": [],
+    "triggers": [
+      "c language"
+    ]
+  },
+  {
+    "slug": "cpp",
+    "name": "C++",
+    "description": "C++ programming language.",
+    "category": "language",
+    "aliases": [
+      "c++"
+    ],
+    "triggers": [
+      "c++"
+    ]
+  },
+  {
+    "slug": "csharp",
+    "name": "C#",
+    "description": "C# programming language.",
+    "category": "language",
+    "aliases": [
+      "csharp",
+      ".net"
+    ],
+    "triggers": [
+      "c#",
+      "csharp"
+    ]
+  },
+  {
+    "slug": "rust",
+    "name": "Rust",
+    "description": "Rust systems programming language.",
+    "category": "language",
+    "aliases": [],
+    "triggers": [
+      "rust"
+    ]
+  },
+  {
+    "slug": "ruby",
+    "name": "Ruby",
+    "description": "Ruby programming language.",
+    "category": "language",
+    "aliases": [],
+    "triggers": [
+      "ruby"
+    ]
+  },
+  {
+    "slug": "php",
+    "name": "PHP",
+    "description": "PHP programming language.",
+    "category": "language",
+    "aliases": [],
+    "triggers": [
+      "php"
+    ]
+  },
+  {
+    "slug": "kotlin",
+    "name": "Kotlin",
+    "description": "Kotlin programming language.",
+    "category": "language",
+    "aliases": [],
+    "triggers": [
+      "kotlin"
+    ]
+  },
+  {
+    "slug": "swift",
+    "name": "Swift",
+    "description": "Swift programming language.",
+    "category": "language",
+    "aliases": [],
+    "triggers": [
+      "swift"
+    ]
+  },
+  {
+    "slug": "dart",
+    "name": "Dart",
+    "description": "Dart programming language.",
+    "category": "language",
+    "aliases": [],
+    "triggers": [
+      "dart"
+    ]
+  },
+  {
+    "slug": "scala",
+    "name": "Scala",
+    "description": "Scala programming language.",
+    "category": "language",
+    "aliases": [],
+    "triggers": [
+      "scala"
+    ]
+  },
+  {
+    "slug": "sql",
+    "name": "SQL",
+    "description": "Structured Query Language for databases.",
+    "category": "language",
+    "aliases": [],
+    "triggers": [
+      "sql"
+    ]
+  },
+  {
+    "slug": "nodejs",
+    "name": "Node.js",
+    "description": "JavaScript runtime built on V8.",
+    "category": "tool",
+    "aliases": [
+      "node"
+    ],
+    "triggers": [
+      "node.js",
+      "nodejs",
+      "node"
+    ]
+  },
+  {
+    "slug": "react",
+    "name": "React",
+    "description": "JavaScript library for building UIs.",
+    "category": "framework",
+    "aliases": [],
+    "triggers": [
+      "react"
+    ]
+  },
+  {
+    "slug": "vue",
+    "name": "Vue.js",
+    "description": "Progressive JavaScript framework.",
+    "category": "framework",
+    "aliases": [
+      "vuejs"
+    ],
+    "triggers": [
+      "vue",
+      "vuejs"
+    ]
+  },
+  {
+    "slug": "angular",
+    "name": "Angular",
+    "description": "Web application framework.",
+    "category": "framework",
+    "aliases": [],
+    "triggers": [
+      "angular"
+    ]
+  },
+  {
+    "slug": "svelte",
+    "name": "Svelte",
+    "description": "Compiler-based UI framework.",
+    "category": "framework",
+    "aliases": [],
+    "triggers": [
+      "svelte"
+    ]
+  },
+  {
+    "slug": "nextjs",
+    "name": "Next.js",
+    "description": "React framework for production apps.",
+    "category": "framework",
+    "aliases": [
+      "next"
+    ],
+    "triggers": [
+      "next.js",
+      "nextjs"
+    ]
+  },
+  {
+    "slug": "django",
+    "name": "Django",
+    "description": "Python web framework.",
+    "category": "framework",
+    "aliases": [],
+    "triggers": [
+      "django"
+    ]
+  },
+  {
+    "slug": "flask",
+    "name": "Flask",
+    "description": "Micro web framework for Python.",
+    "category": "framework",
+    "aliases": [],
+    "triggers": [
+      "flask"
+    ]
+  },
+  {
+    "slug": "fastapi",
+    "name": "FastAPI",
+    "description": "Modern Python API framework.",
+    "category": "framework",
+    "aliases": [],
+    "triggers": [
+      "fastapi"
+    ]
+  },
+  {
+    "slug": "spring-boot",
+    "name": "Spring Boot",
+    "description": "Java application framework.",
+    "category": "framework",
+    "aliases": [
+      "spring"
+    ],
+    "triggers": [
+      "spring boot",
+      "spring"
+    ]
+  },
+  {
+    "slug": "dotnet",
+    "name": ".NET",
+    "description": ".NET platform and framework.",
+    "category": "framework",
+    "aliases": [
+      "dotnet"
+    ],
+    "triggers": [
+      ".net",
+      "dotnet"
+    ]
+  },
+  {
+    "slug": "rails",
+    "name": "Ruby on Rails",
+    "description": "Web framework for Ruby.",
+    "category": "framework",
+    "aliases": [
+      "rails"
+    ],
+    "triggers": [
+      "rails",
+      "ruby on rails"
+    ]
+  },
+  {
+    "slug": "laravel",
+    "name": "Laravel",
+    "description": "PHP web framework.",
+    "category": "framework",
+    "aliases": [],
+    "triggers": [
+      "laravel"
+    ]
+  },
+  {
+    "slug": "express",
+    "name": "Express",
+    "description": "Minimal Node.js web framework.",
+    "category": "framework",
+    "aliases": [
+      "expressjs"
+    ],
+    "triggers": [
+      "express",
+      "expressjs"
+    ]
+  },
+  {
+    "slug": "nestjs",
+    "name": "NestJS",
+    "description": "Progressive Node.js framework.",
+    "category": "framework",
+    "aliases": [
+      "nest"
+    ],
+    "triggers": [
+      "nestjs",
+      "nest"
+    ]
+  },
+  {
+    "slug": "docker",
+    "name": "Docker",
+    "description": "Containerization with Docker.",
+    "category": "infra",
+    "aliases": [
+      "containers"
+    ],
+    "triggers": [
+      "docker",
+      "container"
+    ]
+  },
+  {
+    "slug": "kubernetes",
+    "name": "Kubernetes",
+    "description": "Kubernetes orchestration platform.",
+    "category": "infra",
+    "aliases": [
+      "k8s"
+    ],
+    "triggers": [
+      "kubernetes",
+      "k8s"
+    ]
+  },
+  {
+    "slug": "terraform",
+    "name": "Terraform",
+    "description": "Infrastructure as code tooling.",
+    "category": "infra",
+    "aliases": [],
+    "triggers": [
+      "terraform"
+    ]
+  },
+  {
+    "slug": "git",
+    "name": "Git",
+    "description": "Distributed version control.",
+    "category": "tool",
+    "aliases": [],
+    "triggers": [
+      "git"
+    ]
+  },
+  {
+    "slug": "github-actions",
+    "name": "GitHub Actions",
+    "description": "CI/CD workflows in GitHub.",
+    "category": "tool",
+    "aliases": [
+      "actions"
+    ],
+    "triggers": [
+      "github actions",
+      "actions"
+    ]
+  },
+  {
+    "slug": "postgresql",
+    "name": "PostgreSQL",
+    "description": "PostgreSQL relational database.",
+    "category": "database",
+    "aliases": [
+      "postgres"
+    ],
+    "triggers": [
+      "postgresql",
+      "postgres"
+    ]
+  },
+  {
+    "slug": "mysql",
+    "name": "MySQL",
+    "description": "MySQL relational database.",
+    "category": "database",
+    "aliases": [
+      "mariadb"
+    ],
+    "triggers": [
+      "mysql",
+      "mariadb"
+    ]
+  },
+  {
+    "slug": "mongodb",
+    "name": "MongoDB",
+    "description": "MongoDB document database.",
+    "category": "database",
+    "aliases": [
+      "mongo"
+    ],
+    "triggers": [
+      "mongodb",
+      "mongo"
+    ]
+  },
+  {
+    "slug": "redis",
+    "name": "Redis",
+    "description": "Redis in-memory data store and cache.",
+    "category": "database",
+    "aliases": [],
+    "triggers": [
+      "redis"
+    ]
+  },
+  {
+    "slug": "kafka",
+    "name": "Kafka",
+    "description": "Apache Kafka streaming platform.",
+    "category": "data",
+    "aliases": [
+      "apache kafka"
+    ],
+    "triggers": [
+      "kafka"
+    ]
+  },
+  {
+    "slug": "graphql",
+    "name": "GraphQL",
+    "description": "GraphQL API design and query language.",
+    "category": "api",
+    "aliases": [],
+    "triggers": [
+      "graphql"
+    ]
+  },
+  {
+    "slug": "grpc",
+    "name": "gRPC",
+    "description": "gRPC RPC framework and protobuf APIs.",
+    "category": "api",
+    "aliases": [
+      "protobuf"
+    ],
+    "triggers": [
+      "grpc",
+      "protobuf"
+    ]
+  },
+  {
+    "slug": "rest-api",
+    "name": "REST API",
+    "description": "RESTful API design and HTTP patterns.",
+    "category": "api",
+    "aliases": [
+      "rest"
+    ],
+    "triggers": [
+      "rest",
+      "rest api",
+      "restful"
+    ]
+  },
+  {
+    "slug": "oauth",
+    "name": "OAuth",
+    "description": "OAuth authentication and authorization.",
+    "category": "security",
+    "aliases": [
+      "oauth2"
+    ],
+    "triggers": [
+      "oauth",
+      "oauth2"
+    ]
+  },
+  {
+    "slug": "aws",
+    "name": "AWS",
+    "description": "Amazon Web Services cloud platform.",
+    "category": "cloud",
+    "aliases": [
+      "amazon web services"
+    ],
+    "triggers": [
+      "aws",
+      "amazon web services"
+    ]
+  },
+  {
+    "slug": "gcp",
+    "name": "GCP",
+    "description": "Google Cloud Platform.",
+    "category": "cloud",
+    "aliases": [
+      "google cloud"
+    ],
+    "triggers": [
+      "gcp",
+      "google cloud"
+    ]
+  },
+  {
+    "slug": "azure",
+    "name": "Azure",
+    "description": "Microsoft Azure cloud platform.",
+    "category": "cloud",
+    "aliases": [],
+    "triggers": [
+      "azure"
+    ]
+  },
+  {
+    "slug": "contributing-to-open-source-101",
+    "name": "Contributing to Open Source 101",
+    "description": "A beginner-friendly guide to contributing to open-source projects.",
+    "category": "concept",
+    "aliases": [
+      "open source contributing"
+    ],
+    "triggers": [
+      "contribute",
+      "open source contribution"
+    ]
+  },
+  {
+    "slug": "data-lake",
+    "name": "Data Lake",
+    "description": "Architecture for storing large amounts of raw data.",
+    "category": "concept",
+    "aliases": [
+      "lakehouse"
+    ],
+    "triggers": [
+      "data lake",
+      "lakehouse"
+    ]
+  },
+  {
+    "slug": "data-structures",
+    "name": "Data Structures",
+    "description": "Ways to organize and store data efficiently.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "data structures"
+    ]
+  },
+  {
+    "slug": "algorithms",
+    "name": "Algorithms",
+    "description": "Step-by-step procedures for solving problems.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "algorithms"
+    ]
+  },
+  {
+    "slug": "big-o-notation",
+    "name": "Big-O Notation",
+    "description": "A way to describe algorithm complexity.",
+    "category": "concept",
+    "aliases": [
+      "big o"
+    ],
+    "triggers": [
+      "big-o",
+      "big o"
+    ]
+  },
+  {
+    "slug": "concurrency",
+    "name": "Concurrency",
+    "description": "Managing multiple tasks at the same time.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "concurrency"
+    ]
+  },
+  {
+    "slug": "parallelism",
+    "name": "Parallelism",
+    "description": "Running tasks simultaneously on multiple cores.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "parallelism"
+    ]
+  },
+  {
+    "slug": "multithreading",
+    "name": "Multithreading",
+    "description": "Executing multiple threads within a process.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "multithreading",
+      "multi-threading"
+    ]
+  },
+  {
+    "slug": "asynchronous-programming",
+    "name": "Asynchronous Programming",
+    "description": "Non-blocking execution for IO and long tasks.",
+    "category": "concept",
+    "aliases": [
+      "async"
+    ],
+    "triggers": [
+      "async",
+      "asynchronous"
+    ]
+  },
+  {
+    "slug": "event-driven-architecture",
+    "name": "Event-Driven Architecture",
+    "description": "Systems that react to events and messages.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "event-driven"
+    ]
+  },
+  {
+    "slug": "microservices",
+    "name": "Microservices",
+    "description": "Small, independently deployable services.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "microservices"
+    ]
+  },
+  {
+    "slug": "monolithic-architecture",
+    "name": "Monolithic Architecture",
+    "description": "Single deployable application design.",
+    "category": "concept",
+    "aliases": [
+      "monolith"
+    ],
+    "triggers": [
+      "monolith",
+      "monolithic"
+    ]
+  },
+  {
+    "slug": "distributed-systems",
+    "name": "Distributed Systems",
+    "description": "Systems spanning multiple machines or services.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "distributed systems"
+    ]
+  },
+  {
+    "slug": "consensus-algorithms",
+    "name": "Consensus Algorithms",
+    "description": "Techniques to agree on a single value in distributed systems.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "consensus"
+    ]
+  },
+  {
+    "slug": "cap-theorem",
+    "name": "CAP Theorem",
+    "description": "Trade-offs between consistency, availability, and partition tolerance.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "cap theorem"
+    ]
+  },
+  {
+    "slug": "acid-transactions",
+    "name": "ACID Transactions",
+    "description": "Atomicity, Consistency, Isolation, Durability properties.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "acid"
+    ]
+  },
+  {
+    "slug": "eventual-consistency",
+    "name": "Eventual Consistency",
+    "description": "Consistency model where updates converge over time.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "eventual consistency"
+    ]
+  },
+  {
+    "slug": "caching",
+    "name": "Caching",
+    "description": "Storing data for faster access.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "cache",
+      "caching"
+    ]
+  },
+  {
+    "slug": "load-balancing",
+    "name": "Load Balancing",
+    "description": "Distributing traffic across servers.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "load balancing"
+    ]
+  },
+  {
+    "slug": "rate-limiting",
+    "name": "Rate Limiting",
+    "description": "Controlling request rates to protect systems.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "rate limiting"
+    ]
+  },
+  {
+    "slug": "authentication",
+    "name": "Authentication",
+    "description": "Verifying user or service identity.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "authentication"
+    ]
+  },
+  {
+    "slug": "authorization",
+    "name": "Authorization",
+    "description": "Controlling access to resources.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "authorization"
+    ]
+  },
+  {
+    "slug": "jwt",
+    "name": "JWT",
+    "description": "JSON Web Tokens for stateless auth.",
+    "category": "concept",
+    "aliases": [
+      "json web token"
+    ],
+    "triggers": [
+      "jwt",
+      "json web token"
+    ]
+  },
+  {
+    "slug": "observability",
+    "name": "Observability",
+    "description": "Understanding systems through logs, metrics, and traces.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "observability"
+    ]
+  },
+  {
+    "slug": "logging",
+    "name": "Logging",
+    "description": "Recording events for debugging and audits.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "logging",
+      "logs"
+    ]
+  },
+  {
+    "slug": "metrics",
+    "name": "Metrics",
+    "description": "Numeric measurements for system health.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "metrics"
+    ]
+  },
+  {
+    "slug": "tracing",
+    "name": "Tracing",
+    "description": "Following requests across services.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "tracing",
+      "distributed tracing"
+    ]
+  },
+  {
+    "slug": "testing",
+    "name": "Testing",
+    "description": "Validating software behavior with tests.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "testing"
+    ]
+  },
+  {
+    "slug": "unit-testing",
+    "name": "Unit Testing",
+    "description": "Testing small, isolated units of code.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "unit testing"
+    ]
+  },
+  {
+    "slug": "integration-testing",
+    "name": "Integration Testing",
+    "description": "Testing how components work together.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "integration testing"
+    ]
+  },
+  {
+    "slug": "code-review",
+    "name": "Code Review",
+    "description": "Peer review of changes before merging.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "code review"
+    ]
+  },
+  {
+    "slug": "refactoring",
+    "name": "Refactoring",
+    "description": "Improving code structure without changing behavior.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "refactor",
+      "refactoring"
+    ]
+  },
+  {
+    "slug": "design-patterns",
+    "name": "Design Patterns",
+    "description": "Reusable solutions to common design problems.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "design patterns"
+    ]
+  },
+  {
+    "slug": "solid-principles",
+    "name": "SOLID Principles",
+    "description": "Guidelines for maintainable object-oriented design.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "solid"
+    ]
+  },
+  {
+    "slug": "dependency-injection",
+    "name": "Dependency Injection",
+    "description": "Providing dependencies from the outside.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "dependency injection"
+    ]
+  },
+  {
+    "slug": "api-design",
+    "name": "API Design",
+    "description": "Designing clear and stable APIs.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "api design"
+    ]
+  },
+  {
+    "slug": "message-queues",
+    "name": "Message Queues",
+    "description": "Asynchronous messaging between services.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "message queue",
+      "queue"
+    ]
+  },
+  {
+    "slug": "pub-sub",
+    "name": "Publish/Subscribe",
+    "description": "Messaging pattern with publishers and subscribers.",
+    "category": "concept",
+    "aliases": [
+      "pubsub"
+    ],
+    "triggers": [
+      "pub/sub",
+      "pubsub"
+    ]
+  },
+  {
+    "slug": "data-modeling",
+    "name": "Data Modeling",
+    "description": "Structuring data to fit application needs.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "data modeling"
+    ]
+  },
+  {
+    "slug": "schema-migrations",
+    "name": "Schema Migrations",
+    "description": "Evolving database schemas safely.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "migrations",
+      "schema migration"
+    ]
+  },
+  {
+    "slug": "error-handling",
+    "name": "Error Handling",
+    "description": "Designing how errors are surfaced and recovered.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "error handling"
+    ]
+  },
+  {
+    "slug": "retries-and-backoff",
+    "name": "Retries and Backoff",
+    "description": "Handling transient failures with retries.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "backoff",
+      "retry"
+    ]
+  },
+  {
+    "slug": "idempotency",
+    "name": "Idempotency",
+    "description": "Making operations safe to repeat.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "idempotent"
+    ]
+  },
+  {
+    "slug": "feature-flags",
+    "name": "Feature Flags",
+    "description": "Toggling features without redeploys.",
+    "category": "concept",
+    "aliases": [],
+    "triggers": [
+      "feature flag"
+    ]
+  }
+]

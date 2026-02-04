@@ -69,6 +69,16 @@ func Description(v string) predicate.Concept {
 	return predicate.Concept(sql.FieldEQ(FieldDescription, v))
 }
 
+// Category applies equality check predicate on the "category" field. It's identical to CategoryEQ.
+func Category(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldEQ(FieldCategory, v))
+}
+
+// TutorialMarkdown applies equality check predicate on the "tutorial_markdown" field. It's identical to TutorialMarkdownEQ.
+func TutorialMarkdown(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldEQ(FieldTutorialMarkdown, v))
+}
+
 // SlugEQ applies the EQ predicate on the "slug" field.
 func SlugEQ(v string) predicate.Concept {
 	return predicate.Concept(sql.FieldEQ(FieldSlug, v))
@@ -272,6 +282,156 @@ func DescriptionEqualFold(v string) predicate.Concept {
 // DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
 func DescriptionContainsFold(v string) predicate.Concept {
 	return predicate.Concept(sql.FieldContainsFold(FieldDescription, v))
+}
+
+// CategoryEQ applies the EQ predicate on the "category" field.
+func CategoryEQ(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldEQ(FieldCategory, v))
+}
+
+// CategoryNEQ applies the NEQ predicate on the "category" field.
+func CategoryNEQ(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldNEQ(FieldCategory, v))
+}
+
+// CategoryIn applies the In predicate on the "category" field.
+func CategoryIn(vs ...string) predicate.Concept {
+	return predicate.Concept(sql.FieldIn(FieldCategory, vs...))
+}
+
+// CategoryNotIn applies the NotIn predicate on the "category" field.
+func CategoryNotIn(vs ...string) predicate.Concept {
+	return predicate.Concept(sql.FieldNotIn(FieldCategory, vs...))
+}
+
+// CategoryGT applies the GT predicate on the "category" field.
+func CategoryGT(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldGT(FieldCategory, v))
+}
+
+// CategoryGTE applies the GTE predicate on the "category" field.
+func CategoryGTE(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldGTE(FieldCategory, v))
+}
+
+// CategoryLT applies the LT predicate on the "category" field.
+func CategoryLT(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldLT(FieldCategory, v))
+}
+
+// CategoryLTE applies the LTE predicate on the "category" field.
+func CategoryLTE(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldLTE(FieldCategory, v))
+}
+
+// CategoryContains applies the Contains predicate on the "category" field.
+func CategoryContains(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldContains(FieldCategory, v))
+}
+
+// CategoryHasPrefix applies the HasPrefix predicate on the "category" field.
+func CategoryHasPrefix(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldHasPrefix(FieldCategory, v))
+}
+
+// CategoryHasSuffix applies the HasSuffix predicate on the "category" field.
+func CategoryHasSuffix(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldHasSuffix(FieldCategory, v))
+}
+
+// CategoryIsNil applies the IsNil predicate on the "category" field.
+func CategoryIsNil() predicate.Concept {
+	return predicate.Concept(sql.FieldIsNull(FieldCategory))
+}
+
+// CategoryNotNil applies the NotNil predicate on the "category" field.
+func CategoryNotNil() predicate.Concept {
+	return predicate.Concept(sql.FieldNotNull(FieldCategory))
+}
+
+// CategoryEqualFold applies the EqualFold predicate on the "category" field.
+func CategoryEqualFold(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldEqualFold(FieldCategory, v))
+}
+
+// CategoryContainsFold applies the ContainsFold predicate on the "category" field.
+func CategoryContainsFold(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldContainsFold(FieldCategory, v))
+}
+
+// TutorialMarkdownEQ applies the EQ predicate on the "tutorial_markdown" field.
+func TutorialMarkdownEQ(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldEQ(FieldTutorialMarkdown, v))
+}
+
+// TutorialMarkdownNEQ applies the NEQ predicate on the "tutorial_markdown" field.
+func TutorialMarkdownNEQ(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldNEQ(FieldTutorialMarkdown, v))
+}
+
+// TutorialMarkdownIn applies the In predicate on the "tutorial_markdown" field.
+func TutorialMarkdownIn(vs ...string) predicate.Concept {
+	return predicate.Concept(sql.FieldIn(FieldTutorialMarkdown, vs...))
+}
+
+// TutorialMarkdownNotIn applies the NotIn predicate on the "tutorial_markdown" field.
+func TutorialMarkdownNotIn(vs ...string) predicate.Concept {
+	return predicate.Concept(sql.FieldNotIn(FieldTutorialMarkdown, vs...))
+}
+
+// TutorialMarkdownGT applies the GT predicate on the "tutorial_markdown" field.
+func TutorialMarkdownGT(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldGT(FieldTutorialMarkdown, v))
+}
+
+// TutorialMarkdownGTE applies the GTE predicate on the "tutorial_markdown" field.
+func TutorialMarkdownGTE(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldGTE(FieldTutorialMarkdown, v))
+}
+
+// TutorialMarkdownLT applies the LT predicate on the "tutorial_markdown" field.
+func TutorialMarkdownLT(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldLT(FieldTutorialMarkdown, v))
+}
+
+// TutorialMarkdownLTE applies the LTE predicate on the "tutorial_markdown" field.
+func TutorialMarkdownLTE(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldLTE(FieldTutorialMarkdown, v))
+}
+
+// TutorialMarkdownContains applies the Contains predicate on the "tutorial_markdown" field.
+func TutorialMarkdownContains(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldContains(FieldTutorialMarkdown, v))
+}
+
+// TutorialMarkdownHasPrefix applies the HasPrefix predicate on the "tutorial_markdown" field.
+func TutorialMarkdownHasPrefix(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldHasPrefix(FieldTutorialMarkdown, v))
+}
+
+// TutorialMarkdownHasSuffix applies the HasSuffix predicate on the "tutorial_markdown" field.
+func TutorialMarkdownHasSuffix(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldHasSuffix(FieldTutorialMarkdown, v))
+}
+
+// TutorialMarkdownIsNil applies the IsNil predicate on the "tutorial_markdown" field.
+func TutorialMarkdownIsNil() predicate.Concept {
+	return predicate.Concept(sql.FieldIsNull(FieldTutorialMarkdown))
+}
+
+// TutorialMarkdownNotNil applies the NotNil predicate on the "tutorial_markdown" field.
+func TutorialMarkdownNotNil() predicate.Concept {
+	return predicate.Concept(sql.FieldNotNull(FieldTutorialMarkdown))
+}
+
+// TutorialMarkdownEqualFold applies the EqualFold predicate on the "tutorial_markdown" field.
+func TutorialMarkdownEqualFold(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldEqualFold(FieldTutorialMarkdown, v))
+}
+
+// TutorialMarkdownContainsFold applies the ContainsFold predicate on the "tutorial_markdown" field.
+func TutorialMarkdownContainsFold(v string) predicate.Concept {
+	return predicate.Concept(sql.FieldContainsFold(FieldTutorialMarkdown, v))
 }
 
 // HasProjects applies the HasEdge predicate on the "projects" edge.

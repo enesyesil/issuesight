@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 // Config holds all environment variables for the application.
@@ -28,7 +30,7 @@ type Config struct {
 	GoogleClientSecret string
 
 	// LLM (provider-agnostic via LangChain)
-	LLMProvider    string  // "openai", "anthropic", "ollama", "gemini"
+	LLMProvider    string  // "openai", "anthropic", "ollama", "gemini", "cohere"
 	LLMAPIKey      string  // API key for the provider
 	LLMModel       string  // e.g., "gpt-4o", "claude-3-opus"
 	LLMBaseURL     string  // for Ollama or custom endpoints
@@ -36,8 +38,18 @@ type Config struct {
 	LLMMaxTokens   int
 
 	// Server
-	Port        string
-	Environment string // "development" or "production"
+	Port         string
+	Environment  string // "development" or "production"
+	BaseURL      string // Backend base URL (e.g., https://api.issuesight.com)
+	FrontendURL  string // Frontend URL (e.g., https://issuesight.com)
+	CORSOrigins  string // Comma-separated list of allowed CORS origins
+	CollectorURL string // Collector service URL (e.g., http://localhost:8081)
+
+	// Rate limit (per IP): requests per window. Set to 0 to disable.
+	RateLimitRequests int           // e.g. 60
+	RateLimitWindow   time.Duration // e.g. 1*time.Minute
+	// Quota (per user, per day): issue submissions. Set to 0 to disable.
+	QuotaDailyLimit int
 
 	// Logging
 	LogLevel  string // DEBUG, INFO, WARN, ERROR
@@ -46,10 +58,17 @@ type Config struct {
 	// JWT
 	JWTSecret     string
 	JWTExpiration time.Duration
+
+	// Concepts
+	ConceptsAutoSeed      bool
+	ConceptsForceBackfill bool
 }
 
 // Load reads configuration from environment variables.
 func Load() (*Config, error) {
+	// Load .env file if it exists
+	_ = godotenv.Load()
+
 	cfg := &Config{
 		// Database
 		PostgresURL: getEnv("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/issuesight?sslmode=disable"),
@@ -60,25 +79,35 @@ func Load() (*Config, error) {
 		RedisDB:       getEnvInt("REDIS_DB", 0),
 
 		// GitHub
-		GitHubClientID:     os.Getenv("GITHUB_CLIENT_ID"),
-		GitHubClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
-		GitHubToken:        os.Getenv("GITHUB_TOKEN"),
+		GitHubClientID:     getEnv("GITHUB_CLIENT_ID", ""),
+		GitHubClientSecret: getEnv("GITHUB_CLIENT_SECRET", ""),
+		GitHubToken:        getEnv("GITHUB_TOKEN", ""),
 
 		// Google
-		GoogleClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
-		GoogleClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		GoogleClientID:     getEnv("GOOGLE_CLIENT_ID", ""),
+		GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", ""),
 
 		// LLM
 		LLMProvider:    getEnv("LLM_PROVIDER", "openai"),
-		LLMAPIKey:      os.Getenv("LLM_API_KEY"),
+		LLMAPIKey:      getEnv("LLM_API_KEY", ""),
 		LLMModel:       getEnv("LLM_MODEL", "gpt-4o"),
 		LLMBaseURL:     getEnv("LLM_BASE_URL", ""),
 		LLMTemperature: getEnvFloat("LLM_TEMPERATURE", 0.7),
 		LLMMaxTokens:   getEnvInt("LLM_MAX_TOKENS", 4096),
 
 		// Server
-		Port:        getEnv("PORT", "8080"),
-		Environment: getEnv("ENV", "development"),
+		Port:         getEnv("PORT", "8080"),
+		Environment:  getEnv("ENV", "development"),
+		BaseURL:      getEnv("BASE_URL", "http://localhost:8080"),
+		FrontendURL:  getEnv("FRONTEND_URL", "http://localhost:3000"),
+		CORSOrigins:  getEnv("CORS_ORIGINS", "http://localhost:3000"),
+		CollectorURL: getEnv("COLLECTOR_URL", "http://localhost:8081"),
+
+		// Rate limit: 0 = disabled (use for testing)
+		RateLimitRequests: getEnvInt("RATE_LIMIT_REQUESTS", 60),
+		RateLimitWindow:   getEnvDuration("RATE_LIMIT_WINDOW", time.Minute),
+		// Quota: 0 = unlimited (use for testing)
+		QuotaDailyLimit: getEnvInt("QUOTA_DAILY_LIMIT", 10),
 
 		// Logging
 		LogLevel:  getEnv("LOG_LEVEL", "INFO"),
@@ -87,6 +116,10 @@ func Load() (*Config, error) {
 		// JWT
 		JWTSecret:     getEnv("JWT_SECRET", "change-me-in-production"),
 		JWTExpiration: getEnvDuration("JWT_EXPIRATION", 24*time.Hour),
+
+		// Concepts
+		ConceptsAutoSeed:      getEnvBool("CONCEPTS_AUTO_SEED", false),
+		ConceptsForceBackfill: getEnvBool("CONCEPTS_FORCE_BACKFILL", false),
 	}
 
 	if err := cfg.Validate(); err != nil {
@@ -103,6 +136,9 @@ func (c *Config) Validate() error {
 	}
 	if c.RedisAddr == "" {
 		return errors.New("config: REDIS_ADDR is required")
+	}
+	if c.RedisDB < 0 || c.RedisDB > 15 {
+		return errors.New("config: REDIS_DB must be between 0 and 15")
 	}
 	if c.Environment == "production" {
 		if c.JWTSecret == "change-me-in-production" {
@@ -153,6 +189,15 @@ func getEnvDuration(key string, fallback time.Duration) time.Duration {
 	if v := os.Getenv(key); v != "" {
 		if d, err := time.ParseDuration(v); err == nil {
 			return d
+		}
+	}
+	return fallback
+}
+
+func getEnvBool(key string, fallback bool) bool {
+	if v := os.Getenv(key); v != "" {
+		if b, err := strconv.ParseBool(v); err == nil {
+			return b
 		}
 	}
 	return fallback

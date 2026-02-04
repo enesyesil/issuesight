@@ -79,6 +79,46 @@ func (_u *ConceptUpdate) ClearDescription() *ConceptUpdate {
 	return _u
 }
 
+// SetCategory sets the "category" field.
+func (_u *ConceptUpdate) SetCategory(v string) *ConceptUpdate {
+	_u.mutation.SetCategory(v)
+	return _u
+}
+
+// SetNillableCategory sets the "category" field if the given value is not nil.
+func (_u *ConceptUpdate) SetNillableCategory(v *string) *ConceptUpdate {
+	if v != nil {
+		_u.SetCategory(*v)
+	}
+	return _u
+}
+
+// ClearCategory clears the value of the "category" field.
+func (_u *ConceptUpdate) ClearCategory() *ConceptUpdate {
+	_u.mutation.ClearCategory()
+	return _u
+}
+
+// SetTutorialMarkdown sets the "tutorial_markdown" field.
+func (_u *ConceptUpdate) SetTutorialMarkdown(v string) *ConceptUpdate {
+	_u.mutation.SetTutorialMarkdown(v)
+	return _u
+}
+
+// SetNillableTutorialMarkdown sets the "tutorial_markdown" field if the given value is not nil.
+func (_u *ConceptUpdate) SetNillableTutorialMarkdown(v *string) *ConceptUpdate {
+	if v != nil {
+		_u.SetTutorialMarkdown(*v)
+	}
+	return _u
+}
+
+// ClearTutorialMarkdown clears the value of the "tutorial_markdown" field.
+func (_u *ConceptUpdate) ClearTutorialMarkdown() *ConceptUpdate {
+	_u.mutation.ClearTutorialMarkdown()
+	return _u
+}
+
 // AddProjectIDs adds the "projects" edge to the Project entity by IDs.
 func (_u *ConceptUpdate) AddProjectIDs(ids ...uuid.UUID) *ConceptUpdate {
 	_u.mutation.AddProjectIDs(ids...)
@@ -293,6 +333,18 @@ func (_u *ConceptUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(concept.FieldDescription, field.TypeString)
+	}
+	if value, ok := _u.mutation.Category(); ok {
+		_spec.SetField(concept.FieldCategory, field.TypeString, value)
+	}
+	if _u.mutation.CategoryCleared() {
+		_spec.ClearField(concept.FieldCategory, field.TypeString)
+	}
+	if value, ok := _u.mutation.TutorialMarkdown(); ok {
+		_spec.SetField(concept.FieldTutorialMarkdown, field.TypeString, value)
+	}
+	if _u.mutation.TutorialMarkdownCleared() {
+		_spec.ClearField(concept.FieldTutorialMarkdown, field.TypeString)
 	}
 	if _u.mutation.ProjectsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -542,6 +594,46 @@ func (_u *ConceptUpdateOne) ClearDescription() *ConceptUpdateOne {
 	return _u
 }
 
+// SetCategory sets the "category" field.
+func (_u *ConceptUpdateOne) SetCategory(v string) *ConceptUpdateOne {
+	_u.mutation.SetCategory(v)
+	return _u
+}
+
+// SetNillableCategory sets the "category" field if the given value is not nil.
+func (_u *ConceptUpdateOne) SetNillableCategory(v *string) *ConceptUpdateOne {
+	if v != nil {
+		_u.SetCategory(*v)
+	}
+	return _u
+}
+
+// ClearCategory clears the value of the "category" field.
+func (_u *ConceptUpdateOne) ClearCategory() *ConceptUpdateOne {
+	_u.mutation.ClearCategory()
+	return _u
+}
+
+// SetTutorialMarkdown sets the "tutorial_markdown" field.
+func (_u *ConceptUpdateOne) SetTutorialMarkdown(v string) *ConceptUpdateOne {
+	_u.mutation.SetTutorialMarkdown(v)
+	return _u
+}
+
+// SetNillableTutorialMarkdown sets the "tutorial_markdown" field if the given value is not nil.
+func (_u *ConceptUpdateOne) SetNillableTutorialMarkdown(v *string) *ConceptUpdateOne {
+	if v != nil {
+		_u.SetTutorialMarkdown(*v)
+	}
+	return _u
+}
+
+// ClearTutorialMarkdown clears the value of the "tutorial_markdown" field.
+func (_u *ConceptUpdateOne) ClearTutorialMarkdown() *ConceptUpdateOne {
+	_u.mutation.ClearTutorialMarkdown()
+	return _u
+}
+
 // AddProjectIDs adds the "projects" edge to the Project entity by IDs.
 func (_u *ConceptUpdateOne) AddProjectIDs(ids ...uuid.UUID) *ConceptUpdateOne {
 	_u.mutation.AddProjectIDs(ids...)
@@ -786,6 +878,18 @@ func (_u *ConceptUpdateOne) sqlSave(ctx context.Context) (_node *Concept, err er
 	}
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(concept.FieldDescription, field.TypeString)
+	}
+	if value, ok := _u.mutation.Category(); ok {
+		_spec.SetField(concept.FieldCategory, field.TypeString, value)
+	}
+	if _u.mutation.CategoryCleared() {
+		_spec.ClearField(concept.FieldCategory, field.TypeString)
+	}
+	if value, ok := _u.mutation.TutorialMarkdown(); ok {
+		_spec.SetField(concept.FieldTutorialMarkdown, field.TypeString, value)
+	}
+	if _u.mutation.TutorialMarkdownCleared() {
+		_spec.ClearField(concept.FieldTutorialMarkdown, field.TypeString)
 	}
 	if _u.mutation.ProjectsCleared() {
 		edge := &sqlgraph.EdgeSpec{
