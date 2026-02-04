@@ -2,11 +2,12 @@ package middleware
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/issuesight/issuesight/internal/domain"
+	httputil "github.com/issuesight/issuesight/internal/platform/http"
 	"github.com/issuesight/issuesight/internal/platform/db/ent"
 	"github.com/issuesight/issuesight/internal/platform/db/ent/user"
 )
@@ -61,7 +62,7 @@ func (q *QuotaMiddleware) EnforceQuota(next http.Handler) http.Handler {
 		// Check if user has exceeded quota
 		if q.isQuotaExceeded(dbUser) {
 			retryAfter := q.getRetryAfterSeconds(dbUser)
-			w.Header().Set("Retry-After", string(rune(retryAfter)))
+			w.Header().Set("Retry-After", strconv.Itoa(retryAfter))
 			writeQuotaError(w, http.StatusTooManyRequests, "quota_exceeded",
 				"Daily quota exceeded. Try again tomorrow.")
 			return
@@ -81,7 +82,11 @@ func (q *QuotaMiddleware) EnforceQuota(next http.Handler) http.Handler {
 }
 
 // isQuotaExceeded checks if the user has exceeded their daily quota.
+// When dailyLimit <= 0, quota is disabled (e.g. for testing).
 func (q *QuotaMiddleware) isQuotaExceeded(u *ent.User) bool {
+	if q.dailyLimit <= 0 {
+		return false // Quota disabled
+	}
 	if u.LastRequestedAt == nil {
 		return false // Never requested before
 	}
@@ -123,10 +128,5 @@ func (q *QuotaMiddleware) CheckQuota(ctx context.Context, userID string) (bool, 
 
 // writeQuotaError writes a JSON error response for quota failures.
 func writeQuotaError(w http.ResponseWriter, statusCode int, errorCode, message string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"error":   errorCode,
-		"message": message,
-	})
+	httputil.WriteError(w, statusCode, errorCode, message)
 }

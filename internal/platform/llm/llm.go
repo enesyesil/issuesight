@@ -49,10 +49,3 @@ type Generator interface {
 	// GenerateWithSystem produces a response using system + user prompts.
 	GenerateWithSystem(ctx context.Context, systemPrompt, userPrompt string) (string, error)
 }
-
-// GenerateOptions holds optional parameters for generation.
-type GenerateOptions struct {
-	Temperature float64
-	MaxTokens   int
-	StopWords   []string
-}

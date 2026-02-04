@@ -7,21 +7,32 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/issuesight/issuesight/backend/gateway/middleware"
 	"github.com/issuesight/issuesight/internal/domain"
 	"github.com/issuesight/issuesight/internal/platform/cache"
 	"github.com/issuesight/issuesight/internal/platform/db/ent"
 	"github.com/issuesight/issuesight/internal/platform/db/ent/tutorial"
 	"github.com/issuesight/issuesight/internal/platform/db/ent/tutorialcontent"
+	"github.com/issuesight/issuesight/internal/platform/log"
 )
 
 // TutorialResponse represents a tutorial in API responses.
 type TutorialResponse struct {
-	ID           string    `json:"id"`
-	Title        string    `json:"title"`
-	MarkdownBody string    `json:"markdown_body"`
-	Status       string    `json:"status"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ID           string                    `json:"id"`
+	Title        string                    `json:"title"`
+	MarkdownBody string                    `json:"markdown_body"`
+	Status       string                    `json:"status"`
+	Concepts     []TutorialConceptResponse `json:"concepts,omitempty"`
+	CreatedAt    time.Time                 `json:"created_at"`
+	UpdatedAt    time.Time                 `json:"updated_at"`
+}
+
+// TutorialConceptResponse represents a concept tied to a tutorial.
+type TutorialConceptResponse struct {
+	ID          string `json:"id"`
+	Slug        string `json:"slug"`
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
 }
 
 // TutorialListResponse is the response for listing tutorials.
@@ -52,12 +63,20 @@ func NewTutorialHandler(cache cache.Cache, db *ent.Client) *TutorialHandler {
 // @Param        id   path      string  true  "Tutorial ID"
 // @Success      200  {object}  TutorialResponse
 // @Failure      400  {object}  ErrorResponse
+// @Failure      401  {object}  ErrorResponse
 // @Failure      404  {object}  ErrorResponse
 // @Failure      500  {object}  ErrorResponse
 // @Router       /tutorials/{id} [get]
 func (h *TutorialHandler) Get() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
+
+		// Get authenticated user
+		user := middleware.GetUser(ctx)
+		if user == nil {
+			writeError(w, http.StatusUnauthorized, "unauthorized", "Authentication required")
+			return
+		}
 
 		// Get tutorial ID from path
 		tutorialID := r.PathValue("id")
@@ -73,8 +92,24 @@ func (h *TutorialHandler) Get() http.HandlerFunc {
 			return
 		}
 
-		// Try cache first (cache-aside pattern)
-		cacheKey := domain.CacheKeyTutorial + tutorialID
+		// Check user has access to this tutorial (via Tutorial join table)
+		hasAccess, err := h.db.Tutorial.Query().
+			Where(
+				tutorial.UserIDEQ(user.ID),
+				tutorial.ContentIDEQ(id),
+			).
+			Exist(ctx)
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, "db_error", "Failed to check access")
+			return
+		}
+		if !hasAccess {
+			writeError(w, http.StatusNotFound, "not_found", "Tutorial not found")
+			return
+		}
+
+		// Try cache first (cache-aside pattern) - use user-scoped cache key
+		cacheKey := domain.CacheKeyTutorial + user.ID.String() + ":" + tutorialID
 		cachedData, err := h.cache.Get(ctx, cacheKey)
 		if err == nil {
 			// Cache hit - return cached response
@@ -97,12 +132,33 @@ func (h *TutorialHandler) Get() http.HandlerFunc {
 			return
 		}
 
+		// Fetch linked concepts for this tutorial
+		conceptRows, err := h.db.TutorialContent.Query().
+			Where(tutorialcontent.ID(id)).
+			QueryConcepts().
+			All(ctx)
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, "db_error", "Failed to fetch tutorial concepts")
+			return
+		}
+
+		concepts := make([]TutorialConceptResponse, 0, len(conceptRows))
+		for _, c := range conceptRows {
+			concepts = append(concepts, TutorialConceptResponse{
+				ID:          c.ID.String(),
+				Slug:        c.Slug,
+				Name:        c.Name,
+				Description: c.Description,
+			})
+		}
+
 		// Build response
 		response := TutorialResponse{
 			ID:           content.ID.String(),
 			Title:        content.Title,
 			MarkdownBody: content.MarkdownBody,
 			Status:       string(content.Status),
+			Concepts:     concepts,
 			CreatedAt:    content.CreatedAt,
 			UpdatedAt:    content.UpdatedAt,
 		}
@@ -111,7 +167,12 @@ func (h *TutorialHandler) Get() http.HandlerFunc {
 		jsonData, err := json.Marshal(response)
 		if err == nil {
 			// Cache for 5 minutes
-			_ = h.cache.Set(ctx, cacheKey, jsonData, 5*time.Minute)
+			if cacheErr := h.cache.Set(ctx, cacheKey, jsonData, 5*time.Minute); cacheErr != nil {
+				log.Warn("failed to cache tutorial response",
+					"tutorial_id", tutorialID,
+					"error", cacheErr,
+				)
+			}
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -126,20 +187,25 @@ func (h *TutorialHandler) Get() http.HandlerFunc {
 // @Tags         tutorials
 // @Produce      json
 // @Success      200  {object}  TutorialListResponse
+// @Failure      401  {object}  ErrorResponse
 // @Failure      500  {object}  ErrorResponse
 // @Router       /tutorials [get]
 func (h *TutorialHandler) List() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		// TODO: Get user ID from auth context
-		// For now, we'll list all tutorials (limited)
-		// userID := ctx.Value("user_id").(uuid.UUID)
+		// Get authenticated user
+		user := middleware.GetUser(ctx)
+		if user == nil {
+			writeError(w, http.StatusUnauthorized, "unauthorized", "Authentication required")
+			return
+		}
 
-		// Query tutorials with their content
+		// Query tutorials the user has access to via the Tutorial join table
 		tutorials, err := h.db.Tutorial.Query().
-			WithContent().
-			Order(tutorial.ByCreatedAt()).
+			Where(tutorial.UserIDEQ(user.ID)).
+			QueryContent().
+			Order(tutorialcontent.ByCreatedAt()).
 			Limit(50).
 			All(ctx)
 		if err != nil {
@@ -149,17 +215,15 @@ func (h *TutorialHandler) List() http.HandlerFunc {
 
 		// Build response
 		var tutorialResponses []TutorialResponse
-		for _, t := range tutorials {
-			if t.Edges.Content != nil {
-				tutorialResponses = append(tutorialResponses, TutorialResponse{
-					ID:           t.Edges.Content.ID.String(),
-					Title:        t.Edges.Content.Title,
-					MarkdownBody: t.Edges.Content.MarkdownBody,
-					Status:       string(t.Edges.Content.Status),
-					CreatedAt:    t.Edges.Content.CreatedAt,
-					UpdatedAt:    t.Edges.Content.UpdatedAt,
-				})
-			}
+		for _, c := range tutorials {
+			tutorialResponses = append(tutorialResponses, TutorialResponse{
+				ID:           c.ID.String(),
+				Title:        c.Title,
+				MarkdownBody: c.MarkdownBody,
+				Status:       string(c.Status),
+				CreatedAt:    c.CreatedAt,
+				UpdatedAt:    c.UpdatedAt,
+			})
 		}
 
 		response := TutorialListResponse{

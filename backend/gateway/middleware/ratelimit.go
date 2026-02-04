@@ -2,9 +2,12 @@ package middleware
 
 import (
 	"fmt"
+	"net"
 	"net/http"
+	"strings"
 	"time"
 
+	httputil "github.com/issuesight/issuesight/internal/platform/http"
 	"github.com/issuesight/issuesight/internal/platform/log"
 	"github.com/redis/go-redis/v9"
 )
@@ -25,13 +28,44 @@ func NewRateLimiter(client *redis.Client, rate int, window time.Duration) *RateL
 	}
 }
 
-// Limit enforces rate limiting based on the remote IP address.
+// getClientIP extracts the real client IP address from the request.
+// It checks X-Forwarded-For and X-Real-IP headers before falling back to RemoteAddr.
+func getClientIP(r *http.Request) string {
+	// Check X-Forwarded-For header (can contain multiple IPs)
+	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
+		// Take the first IP (original client)
+		ips := strings.Split(xff, ",")
+		if len(ips) > 0 {
+			ip := strings.TrimSpace(ips[0])
+			if ip != "" {
+				return ip
+			}
+		}
+	}
+
+	// Check X-Real-IP header
+	if xri := r.Header.Get("X-Real-IP"); xri != "" {
+		return strings.TrimSpace(xri)
+	}
+
+	// Fall back to RemoteAddr
+	ip := r.RemoteAddr
+
+	// Remove port if present
+	if host, _, err := net.SplitHostPort(ip); err == nil {
+		return host
+	}
+
+	return ip
+}
+
+// Limit enforces rate limiting based on the client IP address.
 func (rl *RateLimiter) Limit(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		ip := r.RemoteAddr
+		ip := getClientIP(r)
 
-		// Simple key based on IP
+		// Key based on client IP
 		key := "ratelimit:" + ip
 
 		// Use a sliding window approach with Redis
@@ -60,7 +94,7 @@ func (rl *RateLimiter) Limit(next http.Handler) http.Handler {
 		count := countCmd.Val()
 		if count > int64(rl.rate) {
 			log.Warn("rate limit exceeded", "ip", ip, "count", count)
-			http.Error(w, "Too Many Requests", http.StatusTooManyRequests)
+			httputil.WriteError(w, http.StatusTooManyRequests, "rate_limited", "Too many requests. Please slow down.")
 			return
 		}
 

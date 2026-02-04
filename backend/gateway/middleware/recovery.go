@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"runtime/debug"
 
+	httputil "github.com/issuesight/issuesight/internal/platform/http"
 	"github.com/issuesight/issuesight/internal/platform/log"
 )
 
@@ -23,7 +24,7 @@ func Recovery(next http.Handler) http.Handler {
 				)
 
 				// Return 500 Internal Server Error
-				http.Error(w, `{"error":"internal_error","message":"Internal server error"}`, http.StatusInternalServerError)
+				httputil.WriteError(w, http.StatusInternalServerError, "internal_error", "Internal server error")
 			}
 		}()
 		next.ServeHTTP(w, r)

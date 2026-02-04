@@ -1,6 +1,6 @@
 // API Client for IssueSight Gateway
 
-import { Tutorial, TutorialListItem, TutorialListResponse, User, IssueSubmitResponse, QuotaInfo } from './types';
+import { Tutorial, TutorialListItem, TutorialListResponse, User, IssueSubmitResponse, QuotaInfo, Concept, ConceptListResponse } from './types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
@@ -14,16 +14,21 @@ function getCookie(name: string): string | null {
 }
 
 async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
         'Content-Type': 'application/json',
-        ...options?.headers,
     };
+
+    // Merge any additional headers
+    if (options?.headers) {
+        const additionalHeaders = options.headers as Record<string, string>;
+        Object.assign(headers, additionalHeaders);
+    }
 
     // Add CSRF token for mutation requests
     if (options?.method && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(options.method.toUpperCase())) {
         const csrfToken = getCookie('csrf_token');
         if (csrfToken) {
-            (headers as any)['X-CSRF-Token'] = csrfToken;
+            headers['X-CSRF-Token'] = csrfToken;
         }
     }
 
@@ -34,15 +39,35 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
     });
 
     if (!response.ok) {
-        // Handle 401 Unauthorized (e.g., redirect to login)
-        if (response.status === 401) {
-            // Optional: window.location.href = '/login';
+        // Handle 401 Unauthorized - redirect to login (client-side only)
+        if (response.status === 401 && typeof window !== 'undefined') {
+            // Avoid redirect loop if already on login page
+            if (!window.location.pathname.startsWith('/login')) {
+                window.location.href = '/login';
+            }
         }
 
         const error = await response.json().catch(() => ({ message: 'Request failed' }));
         throw new Error(error.message || `HTTP error ${response.status}`);
     }
 
+    return response.json();
+}
+
+async function fetchApiOptional<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+    };
+    if (options?.headers) {
+        const additionalHeaders = options.headers as Record<string, string>;
+        Object.assign(headers, additionalHeaders);
+    }
+    const response = await fetch(`${API_BASE}${endpoint}`, {
+        ...options,
+        credentials: 'include',
+        headers,
+    });
+    if (response.status === 404 || !response.ok) return null;
     return response.json();
 }
 
@@ -80,6 +105,20 @@ export const api = {
     quota: {
         get: (): Promise<QuotaInfo> =>
             fetchApi('/api/quota'),
+    },
+
+    concepts: {
+        list: async (): Promise<ConceptListResponse> => {
+            try {
+                const res = await fetch(`${API_BASE}/api/concepts`, { credentials: 'include' });
+                if (res.status === 404 || !res.ok) return { concepts: [], count: 0 };
+                return res.json();
+            } catch {
+                return { concepts: [], count: 0 };
+            }
+        },
+        get: (slug: string): Promise<Concept | null> =>
+            fetchApiOptional(`/api/concepts/${encodeURIComponent(slug)}`),
     },
 };
 

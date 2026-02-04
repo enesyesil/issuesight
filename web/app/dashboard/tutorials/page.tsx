@@ -11,15 +11,19 @@ import { TutorialListResponse } from '@/lib/types';
 export default function TutorialsPage() {
     const { data, error, isLoading } = useSWR<TutorialListResponse>('/api/tutorials', () => api.tutorials.list());
 
-    // api.tutorials.list returns Promise<TutorialListResponse> now (I need to check api.ts)
-    // Wait, api.ts might interpret the response.
-    // If api.ts returns `any` or `TutorialListItem[]`, I need to fix api.ts too.
-    // Assuming api.ts returns the JSON response directly.
-
     const tutorials = data?.tutorials;
 
     if (isLoading) {
-        return <div className="p-8 text-center bg-muted/20 rounded-lg animate-pulse h-64 flex items-center justify-center">Loading tutorials...</div>;
+        return (
+            <div 
+                className="p-8 text-center bg-muted/20 rounded-lg animate-pulse h-64 flex items-center justify-center"
+                role="status"
+                aria-live="polite"
+            >
+                <span>Loading tutorials...</span>
+                <span className="sr-only">Please wait while tutorials are loading</span>
+            </div>
+        );
     }
 
     if (error) {
@@ -51,16 +55,19 @@ export default function TutorialsPage() {
 
     return (
         <div className="flex flex-col gap-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Tutorials</h1>
-                <p className="text-muted-foreground">
-                    Your library of generated tutorials.
-                </p>
+            <div className="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Library</p>
+                    <h1 className="text-3xl font-bold tracking-tight">Tutorials</h1>
+                    <p className="text-muted-foreground">
+                        Your library of generated tutorials.
+                    </p>
+                </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {tutorials.map((tutorial) => (
-                    <Link key={tutorial.id} href={`/dashboard/tutorials/${tutorial.id}`}>
-                        <Card className="h-full hover:bg-muted/50 transition-colors flex flex-col">
+                    <Link key={tutorial.id} href={`/dashboard/tutorials/${tutorial.id}`} className="group">
+                        <Card className="h-full transition-all duration-200 group-hover:-translate-y-0.5 group-hover:shadow-md flex flex-col">
                             <CardHeader>
                                 <div className="flex justify-between items-start gap-2">
                                     <CardTitle className="line-clamp-2 text-lg">
@@ -71,7 +78,6 @@ export default function TutorialsPage() {
                                     </Badge>
                                 </div>
                                 <CardDescription className="line-clamp-3">
-                                    {/* Backend doesn't return issue title, so we show date/id or just date */}
                                     Created {new Date(tutorial.created_at).toLocaleDateString()}
                                 </CardDescription>
                             </CardHeader>

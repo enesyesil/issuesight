@@ -13,7 +13,7 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -o ai-processor ./backend/ai-processor/main.go ./backend/ai-processor/service.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o ai-processor ./backend/ai-processor
 
 # Run stage
 FROM alpine:latest
@@ -22,7 +22,10 @@ WORKDIR /app
 
 # Copy binary from builder
 COPY --from=builder /app/ai-processor .
-COPY --from=builder /app/.env .
+
+# Expose port
+EXPOSE 8082
 
 # Run the application
+# Environment variables should be provided at runtime via docker-compose or k8s
 CMD ["./ai-processor"]

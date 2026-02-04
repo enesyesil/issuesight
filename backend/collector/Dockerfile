@@ -22,7 +22,10 @@ WORKDIR /app
 
 # Copy binary from builder
 COPY --from=builder /app/collector .
-COPY --from=builder /app/.env .
+
+# Expose port
+EXPOSE 8081
 
 # Run the application
+# Environment variables should be provided at runtime via docker-compose or k8s
 CMD ["./collector"]

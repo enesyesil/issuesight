@@ -23,6 +23,10 @@ type Concept struct {
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
+	// Concept category, e.g. project, language, framework
+	Category string `json:"category,omitempty"`
+	// Beginner-friendly concept tutorial in markdown
+	TutorialMarkdown string `json:"tutorial_markdown,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ConceptQuery when eager-loading is set.
 	Edges        ConceptEdges `json:"edges"`
@@ -107,7 +111,7 @@ func (*Concept) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case concept.FieldSlug, concept.FieldName, concept.FieldDescription:
+		case concept.FieldSlug, concept.FieldName, concept.FieldDescription, concept.FieldCategory, concept.FieldTutorialMarkdown:
 			values[i] = new(sql.NullString)
 		case concept.FieldID:
 			values[i] = new(uuid.UUID)
@@ -149,6 +153,18 @@ func (_m *Concept) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
 				_m.Description = value.String
+			}
+		case concept.FieldCategory:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field category", values[i])
+			} else if value.Valid {
+				_m.Category = value.String
+			}
+		case concept.FieldTutorialMarkdown:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field tutorial_markdown", values[i])
+			} else if value.Valid {
+				_m.TutorialMarkdown = value.String
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -224,6 +240,12 @@ func (_m *Concept) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(_m.Description)
+	builder.WriteString(", ")
+	builder.WriteString("category=")
+	builder.WriteString(_m.Category)
+	builder.WriteString(", ")
+	builder.WriteString("tutorial_markdown=")
+	builder.WriteString(_m.TutorialMarkdown)
 	builder.WriteByte(')')
 	return builder.String()
 }

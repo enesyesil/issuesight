@@ -9,7 +9,6 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/issuesight/issuesight/backend/collector/github"
 	"github.com/issuesight/issuesight/backend/collector/parser"
 	"github.com/issuesight/issuesight/internal/domain"
 	"github.com/issuesight/issuesight/internal/platform/lock"
@@ -22,10 +21,16 @@ var (
 	ErrPublishFailed    = errors.New("collector: failed to publish to stream")
 )
 
+// GitHubFetcher interface for GitHub API operations.
+type GitHubFetcher interface {
+	FetchIssue(ctx context.Context, owner, repo string, number int) (*domain.Issue, error)
+	FetchRepository(ctx context.Context, owner, repo string) (*domain.Repository, error)
+}
+
 // Service is the core collector service that fetches GitHub issues
 // and publishes them to Redis Streams for AI processing.
 type Service struct {
-	github    *github.Client
+	github    GitHubFetcher
 	publisher stream.Publisher
 	locker    lock.Locker
 	logger    *slog.Logger
@@ -37,7 +42,7 @@ type Service struct {
 
 // ServiceConfig holds configuration for the collector service.
 type ServiceConfig struct {
-	GitHub     *github.Client
+	GitHub     GitHubFetcher
 	Publisher  stream.Publisher
 	Locker     lock.Locker
 	Logger     *slog.Logger
@@ -85,7 +90,7 @@ func NewService(cfg ServiceConfig) (*Service, error) {
 //  4. Fetch issue details from GitHub
 //  5. Publish to Redis Stream
 //  6. Release lock
-func (s *Service) CollectIssue(ctx context.Context, issueURL string) error {
+func (s *Service) CollectIssue(ctx context.Context, issueURL string, userID string) error {
 	start := time.Now()
 
 	// 1. Parse URL
@@ -130,8 +135,8 @@ func (s *Service) CollectIssue(ctx context.Context, issueURL string) error {
 		return fmt.Errorf("fetch issue: %w", err)
 	}
 
-	// 5. Build payload and publish
-	payload := s.buildPayload(issue, repo)
+	// 5. Build payload and publish (include user_id for access control)
+	payload := s.buildPayload(issue, repo, userID)
 
 	msgID, err := s.publisher.Publish(ctx, s.streamName, payload)
 	if err != nil {
@@ -142,6 +147,7 @@ func (s *Service) CollectIssue(ctx context.Context, issueURL string) error {
 		"owner", parsed.Owner,
 		"repo", parsed.Repo,
 		"number", parsed.Number,
+		"user_id", userID,
 		"message_id", msgID,
 		"duration_ms", time.Since(start).Milliseconds(),
 	)
@@ -150,30 +156,43 @@ func (s *Service) CollectIssue(ctx context.Context, issueURL string) error {
 }
 
 // buildPayload creates the stream message payload.
-func (s *Service) buildPayload(issue *domain.Issue, repo *domain.Repository) map[string]interface{} {
+func (s *Service) buildPayload(issue *domain.Issue, repo *domain.Repository, userID string) map[string]interface{} {
 	// Convert labels to JSON string for Redis
-	labelsJSON, _ := json.Marshal(issue.Labels)
+	labelsJSON, err := json.Marshal(issue.Labels)
+	if err != nil {
+		s.logger.Warn("failed to marshal labels, using empty array",
+			"error", err,
+			"labels", issue.Labels,
+		)
+		labelsJSON = []byte("[]")
+	}
 
 	return map[string]interface{}{
-		"issue_id":      issue.ID,
-		"issue_number":  issue.Number,
-		"owner":         issue.RepoOwner,
-		"repo":          issue.RepoName,
-		"full_name":     issue.RepoFullName,
-		"title":         truncateString(issue.Title, 500),
-		"body":          truncateString(issue.Body, 100000), // ~100KB limit
-		"labels":        string(labelsJSON),
-		"state":         issue.State,
-		"html_url":      issue.HTMLURL,
-		"repo_id":       repo.ID,
-		"repo_language": repo.Language,
-		"repo_stars":    repo.Stars,
-		"collected_at":  time.Now().UTC().Format(time.RFC3339),
+		"issue_id":         issue.ID,
+		"issue_number":     issue.Number,
+		"owner":            issue.RepoOwner,
+		"repo":             issue.RepoName,
+		"full_name":        issue.RepoFullName,
+		"title":            truncateString(issue.Title, 500),
+		"body":             truncateString(issue.Body, 100000), // ~100KB limit
+		"labels":           string(labelsJSON),
+		"state":            issue.State,
+		"html_url":         issue.HTMLURL,
+		"repo_id":          repo.ID,
+		"repo_language":    repo.Language,
+		"repo_stars":       repo.Stars,
+		"repo_description": truncateString(repo.Description, 1000),
+		"collected_at":     time.Now().UTC().Format(time.RFC3339),
+		"user_id":          userID, // Requesting user for access control
 	}
 }
 
 // truncateString truncates a string to the specified length.
+// If maxLen is less than 4, returns empty string to avoid panic.
 func truncateString(s string, maxLen int) string {
+	if maxLen < 4 {
+		return ""
+	}
 	if len(s) <= maxLen {
 		return s
 	}

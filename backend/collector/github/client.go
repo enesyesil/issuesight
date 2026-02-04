@@ -120,60 +120,6 @@ func (c *Client) FetchRepository(ctx context.Context, owner, repo string) (*doma
 	return toDomainRepository(repository), nil
 }
 
-// FetchIssueComments retrieves all comments for an issue.
-// Returns comment bodies as strings.
-func (c *Client) FetchIssueComments(ctx context.Context, owner, repo string, number int) ([]string, error) {
-	if err := validateParams(owner, repo, number); err != nil {
-		return nil, err
-	}
-
-	// Check rate limit before making request
-	if err := c.rateLimit.WaitIfNeeded(ctx, c.logger); err != nil {
-		return nil, err
-	}
-
-	start := time.Now()
-
-	// Fetch all comments with pagination
-	opts := &ghlib.IssueListCommentsOptions{
-		ListOptions: ghlib.ListOptions{PerPage: 100},
-	}
-
-	var allComments []string
-
-	for {
-		comments, resp, err := c.client.Issues.ListComments(ctx, owner, repo, number, opts)
-
-		// Update rate limit info
-		c.rateLimit.UpdateFromResponse(resp)
-
-		if err != nil {
-			return nil, c.handleError(err, resp, "fetch comments", owner, repo, number)
-		}
-
-		for _, comment := range comments {
-			if comment.Body != nil {
-				allComments = append(allComments, *comment.Body)
-			}
-		}
-
-		if resp.NextPage == 0 {
-			break
-		}
-		opts.Page = resp.NextPage
-	}
-
-	c.logger.Debug("fetched comments",
-		"owner", owner,
-		"repo", repo,
-		"number", number,
-		"count", len(allComments),
-		"duration_ms", time.Since(start).Milliseconds(),
-	)
-
-	return allComments, nil
-}
-
 // ValidateToken checks if the configured token is valid by calling /user.
 func (c *Client) ValidateToken(ctx context.Context) error {
 	_, resp, err := c.client.Users.Get(ctx, "")
@@ -189,11 +135,6 @@ func (c *Client) ValidateToken(ctx context.Context) error {
 	)
 
 	return nil
-}
-
-// RateLimitStatus returns the current rate limit status.
-func (c *Client) RateLimitStatus() (remaining, limit int, reset time.Time) {
-	return c.rateLimit.Status()
 }
 
 // handleError converts GitHub API errors to our error types.

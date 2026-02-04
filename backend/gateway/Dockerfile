@@ -22,10 +22,10 @@ WORKDIR /app
 
 # Copy binary from builder
 COPY --from=builder /app/gateway .
-COPY --from=builder /app/.env .
 
 # Expose port
 EXPOSE 8080
 
 # Run the application
+# Environment variables should be provided at runtime via docker-compose or k8s
 CMD ["./gateway"]

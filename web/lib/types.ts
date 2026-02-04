@@ -9,13 +9,16 @@ export interface User {
 
 export interface AuthenticatedUser extends User { }
 
+export type TutorialStatus = 'pending' | 'processing' | 'completed' | 'failed';
+
 export interface Tutorial {
     id: string;
     title: string;
     markdown_body: string;
-    status: string; // 'pending' | 'completed' | 'failed'
+    status: TutorialStatus;
     created_at: string;
     updated_at: string;
+    concepts?: Concept[];
 }
 
 export interface TutorialListItem extends Tutorial { }
@@ -40,7 +43,24 @@ export interface ApiError {
 }
 
 export interface QuotaInfo {
-    used: number;
+    remaining: number;
     limit: number;
     resets_at: string;
+    is_exceeded: boolean;
+}
+
+// Concepts (interface-defined for future backend)
+export interface Concept {
+    id: string;
+    slug: string;
+    name: string;
+    description?: string;
+    category?: string;
+    tutorial_markdown?: string;
+    created_at?: string;
+}
+
+export interface ConceptListResponse {
+    concepts: Concept[];
+    count: number;
 }

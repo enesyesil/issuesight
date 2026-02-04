@@ -49,6 +49,34 @@ func (_c *ConceptCreate) SetNillableDescription(v *string) *ConceptCreate {
 	return _c
 }
 
+// SetCategory sets the "category" field.
+func (_c *ConceptCreate) SetCategory(v string) *ConceptCreate {
+	_c.mutation.SetCategory(v)
+	return _c
+}
+
+// SetNillableCategory sets the "category" field if the given value is not nil.
+func (_c *ConceptCreate) SetNillableCategory(v *string) *ConceptCreate {
+	if v != nil {
+		_c.SetCategory(*v)
+	}
+	return _c
+}
+
+// SetTutorialMarkdown sets the "tutorial_markdown" field.
+func (_c *ConceptCreate) SetTutorialMarkdown(v string) *ConceptCreate {
+	_c.mutation.SetTutorialMarkdown(v)
+	return _c
+}
+
+// SetNillableTutorialMarkdown sets the "tutorial_markdown" field if the given value is not nil.
+func (_c *ConceptCreate) SetNillableTutorialMarkdown(v *string) *ConceptCreate {
+	if v != nil {
+		_c.SetTutorialMarkdown(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *ConceptCreate) SetID(v uuid.UUID) *ConceptCreate {
 	_c.mutation.SetID(v)
@@ -228,6 +256,14 @@ func (_c *ConceptCreate) createSpec() (*Concept, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Description(); ok {
 		_spec.SetField(concept.FieldDescription, field.TypeString, value)
 		_node.Description = value
+	}
+	if value, ok := _c.mutation.Category(); ok {
+		_spec.SetField(concept.FieldCategory, field.TypeString, value)
+		_node.Category = value
+	}
+	if value, ok := _c.mutation.TutorialMarkdown(); ok {
+		_spec.SetField(concept.FieldTutorialMarkdown, field.TypeString, value)
+		_node.TutorialMarkdown = value
 	}
 	if nodes := _c.mutation.ProjectsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

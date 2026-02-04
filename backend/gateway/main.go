@@ -7,6 +7,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,13 +16,12 @@ import (
 
 	_ "github.com/lib/pq" // PostgreSQL driver
 
+	"github.com/issuesight/issuesight/internal/concepts"
 	"github.com/issuesight/issuesight/internal/config"
 	"github.com/issuesight/issuesight/internal/platform/cache"
 	"github.com/issuesight/issuesight/internal/platform/db/ent"
-	"github.com/issuesight/issuesight/internal/platform/lock"
 	"github.com/issuesight/issuesight/internal/platform/log"
 	"github.com/issuesight/issuesight/internal/platform/redis"
-	"github.com/issuesight/issuesight/internal/platform/stream"
 )
 
 const (
@@ -34,7 +34,9 @@ func main() {
 	// 1. Load configuration
 	cfg, err := config.Load()
 	if err != nil {
-		panic("failed to load config: " + err.Error())
+		// Use fmt to stderr for config errors since logger isn't initialized yet
+		fmt.Fprintf(os.Stderr, "failed to load config: %v\n", err)
+		os.Exit(1)
 	}
 
 	port := cfg.Port
@@ -96,6 +98,19 @@ func main() {
 	cancel()
 	log.Info("connected to postgres")
 
+	// Auto-seed concepts (catalog + deterministic backfill) if enabled
+	if cfg.ConceptsAutoSeed {
+		ctx, cancel = context.WithTimeout(context.Background(), 60*time.Second)
+		if err := concepts.AutoSeed(ctx, dbClient, logger, concepts.SeedOptions{
+			ForceBackfill: cfg.ConceptsForceBackfill,
+		}); err != nil {
+			log.Warn("concepts auto-seed failed", "error", err)
+		} else {
+			log.Info("concepts auto-seed completed")
+		}
+		cancel()
+	}
+
 	// 5. Initialize platform components
 	cacheClient, err := cache.NewRedisCache(redisClient)
 	if err != nil {
@@ -103,29 +118,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	locker, err := lock.NewRedisLocker(redisClient)
-	if err != nil {
-		log.Error("failed to create locker", "error", err)
-		os.Exit(1)
-	}
-
-	publisher, err := stream.NewRedisPublisher(redisClient, stream.PublisherConfig{
-		MaxLen: 10000,
-	})
-	if err != nil {
-		log.Error("failed to create stream publisher", "error", err)
-		os.Exit(1)
-	}
-
 	// 6. Set up HTTP server using server.go
 	server := NewServer(
 		DefaultServerConfig(port),
 		ServerDeps{
-			Redis:     redisClient,
-			DB:        dbClient,
-			Cache:     cacheClient,
-			Locker:    locker,
-			Publisher: publisher,
+			Redis:        redisClient,
+			DB:           dbClient,
+			Cache:        cacheClient,
+			CollectorURL: cfg.CollectorURL,
 		},
 	)
 

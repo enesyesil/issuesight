@@ -1,0 +1,46 @@
+# Environment files - never include secrets in Docker images
+.env
+.env.*
+*.env
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Documentation
+*.md
+!README.md
+
+# Test files
+*_test.go
+**/*_test.go
+
+# Build artifacts
+bin/
+dist/
+
+# Node modules (for web/)
+node_modules/
+web/node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+
+# Plan files
+plans/
+.cursor/

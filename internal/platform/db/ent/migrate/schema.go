@@ -14,6 +14,8 @@ var (
 		{Name: "slug", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "category", Type: field.TypeString, Nullable: true},
+		{Name: "tutorial_markdown", Type: field.TypeString, Nullable: true, Size: 2147483647},
 	}
 	// ConceptsTable holds the schema information for the "concepts" table.
 	ConceptsTable = &schema.Table{

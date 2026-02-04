@@ -14,20 +14,21 @@ func TestTransformStreamMessage(t *testing.T) {
 		{
 			name: "valid payload with all fields",
 			payload: map[string]interface{}{
-				"issue_id":      "12345",
-				"issue_number":  "42",
-				"owner":         "testowner",
-				"repo":          "testrepo",
-				"full_name":     "testowner/testrepo",
-				"title":         "Test Issue Title",
-				"body":          "This is the issue body",
-				"labels":        `["bug","feature"]`,
-				"state":         "open",
-				"html_url":      "https://github.com/testowner/testrepo/issues/42",
-				"repo_id":       "67890",
-				"repo_language": "Go",
-				"repo_stars":    "100",
-				"collected_at":  "2024-01-15T10:30:00Z",
+				"issue_id":         "12345",
+				"issue_number":     "42",
+				"owner":            "testowner",
+				"repo":             "testrepo",
+				"full_name":        "testowner/testrepo",
+				"title":            "Test Issue Title",
+				"body":             "This is the issue body",
+				"labels":           `["bug","feature"]`,
+				"state":            "open",
+				"html_url":         "https://github.com/testowner/testrepo/issues/42",
+				"repo_id":          "67890",
+				"repo_language":    "Go",
+				"repo_stars":       "100",
+				"repo_description": "Example repository description",
+				"collected_at":     "2024-01-15T10:30:00Z",
 			},
 			wantErr: false,
 			check: func(t *testing.T, p *StreamIssuePayload) {
@@ -51,6 +52,9 @@ func TestTransformStreamMessage(t *testing.T) {
 				}
 				if p.RepoLanguage != "Go" {
 					t.Errorf("RepoLanguage = %s, want Go", p.RepoLanguage)
+				}
+				if p.RepoDescription != "Example repository description" {
+					t.Errorf("RepoDescription = %s, want example description", p.RepoDescription)
 				}
 			},
 		},
@@ -220,5 +224,103 @@ func TestStreamIssuePayload_ToRepository(t *testing.T) {
 	}
 	if repo.Stars != payload.RepoStars {
 		t.Errorf("Stars = %d, want %d", repo.Stars, payload.RepoStars)
+	}
+}
+
+func TestTransformStreamMessage_FieldLengthLimits(t *testing.T) {
+	longString := func(n int) string {
+		s := make([]byte, n)
+		for i := range s {
+			s[i] = 'a'
+		}
+		return string(s)
+	}
+
+	tests := []struct {
+		name    string
+		payload map[string]interface{}
+		wantErr bool
+		check   func(t *testing.T, p *StreamIssuePayload)
+	}{
+		{
+			name: "owner exceeds max length",
+			payload: map[string]interface{}{
+				"issue_id": int64(12345),
+				"owner":    longString(150), // Exceeds MaxOwnerLength (100)
+				"repo":     "testrepo",
+				"title":    "Test Issue",
+			},
+			wantErr: true,
+		},
+		{
+			name: "repo exceeds max length",
+			payload: map[string]interface{}{
+				"issue_id": int64(12345),
+				"owner":    "testowner",
+				"repo":     longString(300), // Exceeds MaxRepoLength (256)
+				"title":    "Test Issue",
+			},
+			wantErr: true,
+		},
+		{
+			name: "title gets truncated instead of failing",
+			payload: map[string]interface{}{
+				"issue_id": int64(12345),
+				"owner":    "testowner",
+				"repo":     "testrepo",
+				"title":    longString(2000), // Exceeds MaxTitleLength (1024)
+			},
+			wantErr: false,
+			check: func(t *testing.T, p *StreamIssuePayload) {
+				if len(p.Title) != MaxTitleLength {
+					t.Errorf("Title length = %d, want %d (truncated)", len(p.Title), MaxTitleLength)
+				}
+			},
+		},
+		{
+			name: "body gets truncated instead of failing",
+			payload: map[string]interface{}{
+				"issue_id": int64(12345),
+				"owner":    "testowner",
+				"repo":     "testrepo",
+				"title":    "Test Issue",
+				"body":     longString(600000), // Exceeds MaxBodyLength (500000)
+			},
+			wantErr: false,
+			check: func(t *testing.T, p *StreamIssuePayload) {
+				if len(p.Body) != MaxBodyLength {
+					t.Errorf("Body length = %d, want %d (truncated)", len(p.Body), MaxBodyLength)
+				}
+			},
+		},
+		{
+			name: "url gets truncated instead of failing",
+			payload: map[string]interface{}{
+				"issue_id": int64(12345),
+				"owner":    "testowner",
+				"repo":     "testrepo",
+				"title":    "Test Issue",
+				"html_url": longString(3000), // Exceeds MaxURLLength (2048)
+			},
+			wantErr: false,
+			check: func(t *testing.T, p *StreamIssuePayload) {
+				if len(p.HTMLURL) != MaxURLLength {
+					t.Errorf("HTMLURL length = %d, want %d (truncated)", len(p.HTMLURL), MaxURLLength)
+				}
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			payload, err := TransformStreamMessage(tt.payload)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("TransformStreamMessage() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr && tt.check != nil {
+				tt.check(t, payload)
+			}
+		})
 	}
 }

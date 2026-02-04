@@ -1,16 +1,19 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import {
     LayoutDashboard,
-    FileText,
     BookOpen,
+    Lightbulb,
     LogOut,
-    Menu,
+    Loader2,
 } from 'lucide-react';
 
 export default function DashboardLayout({
@@ -19,7 +22,39 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
-    const { user, logout } = useAuth();
+    const router = useRouter();
+    const { user, isLoading, isAuthenticated, logout } = useAuth();
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+    // Auth guard - redirect to login if not authenticated
+    useEffect(() => {
+        if (!isLoading && !isAuthenticated) {
+            router.push('/login');
+        }
+    }, [isLoading, isAuthenticated, router]);
+
+    // Show loading while checking auth
+    if (isLoading) {
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+        );
+    }
+
+    // Don't render dashboard if not authenticated (will redirect)
+    if (!isAuthenticated) {
+        return null;
+    }
+
+    const handleLogout = async () => {
+        setIsLoggingOut(true);
+        try {
+            await logout();
+        } finally {
+            setIsLoggingOut(false);
+        }
+    };
 
     const navItems = [
         {
@@ -32,28 +67,79 @@ export default function DashboardLayout({
             href: '/dashboard/tutorials',
             icon: BookOpen,
         },
+        {
+            title: 'Concepts',
+            href: '/dashboard/concepts',
+            icon: Lightbulb,
+        },
     ];
 
     return (
-        <div className="flex min-h-screen flex-col md:flex-row">
-            {/* Sidebar */}
-            <aside className="w-full border-r bg-muted/40 md:w-64 md:flex-col hidden md:flex">
-                <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-                    <Link href="/" className="flex items-center gap-2 font-semibold">
-                        <span className="">IssueSight</span>
+        <div className="min-h-screen bg-background flex flex-col">
+            <header className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur shadow-sm px-4 lg:px-6">
+                <div className="mx-auto flex w-full max-w-6xl items-center gap-6 py-4">
+                    <Link href="/" className="flex items-center gap-3 font-semibold tracking-wide">
+                        <Image
+                            src="/issue-logo.png"
+                            alt="IssueSight logo"
+                            width={40}
+                            height={40}
+                            className="h-10 w-10"
+                        />
+                        <span>IssueSight</span>
                     </Link>
-                </div>
-                <div className="flex-1">
-                    <nav className="grid items-start px-2 text-sm font-medium lg:px-4 mt-4 gap-1">
+                    <nav className="hidden md:flex items-center gap-2 text-sm font-medium">
                         {navItems.map((item) => (
                             <Link
                                 key={item.href}
                                 href={item.href}
                                 className={cn(
-                                    "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary",
+                                    "flex items-center gap-2 rounded-full px-4 py-2 transition-colors",
                                     pathname === item.href
-                                        ? "bg-muted text-primary"
-                                        : "text-muted-foreground"
+                                        ? "bg-primary/10 text-primary"
+                                        : "text-muted-foreground hover:text-foreground"
+                                )}
+                            >
+                                <item.icon className="h-4 w-4" />
+                                {item.title}
+                            </Link>
+                        ))}
+                    </nav>
+                    <div className="ml-auto flex items-center gap-3">
+                        {user && (
+                            <div className="hidden sm:flex flex-col text-right">
+                                <span className="text-xs text-muted-foreground">Signed in as</span>
+                                <span className="text-sm font-medium truncate max-w-[200px]">
+                                    {user.display_name}
+                                </span>
+                            </div>
+                        )}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={handleLogout}
+                            disabled={isLoggingOut}
+                            aria-label="Log out"
+                        >
+                            {isLoggingOut ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                <LogOut className="h-4 w-4" />
+                            )}
+                        </Button>
+                    </div>
+                </div>
+                <div className="md:hidden border-t pb-3">
+                    <nav className="flex gap-2 overflow-x-auto pt-3 text-sm font-medium">
+                        {navItems.map((item) => (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={cn(
+                                    "flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2",
+                                    pathname === item.href
+                                        ? "bg-primary/15 text-primary"
+                                        : "bg-muted/60 text-muted-foreground"
                                 )}
                             >
                                 <item.icon className="h-4 w-4" />
@@ -62,37 +148,26 @@ export default function DashboardLayout({
                         ))}
                     </nav>
                 </div>
-                <div className="mt-auto p-4">
-                    <div className="flex items-center gap-2 px-2 py-4 border-t">
-                        {user && (
-                            <div className="flex-1 overflow-hidden">
-                                <p className="truncate text-sm font-medium">{user.display_name}</p>
-                                <p className="truncate text-xs text-muted-foreground">{user.email}</p>
-                            </div>
-                        )}
-                        <Button variant="ghost" size="icon" onClick={() => logout()}>
-                            <LogOut className="h-4 w-4" />
-                        </Button>
+            </header>
+
+            <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+                <ErrorBoundary>
+                    <div className="mx-auto w-full max-w-6xl">
+                        {children}
+                    </div>
+                </ErrorBoundary>
+            </main>
+
+            <footer className="border-t bg-muted/30 px-4 lg:px-6">
+                <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+                    <span>IssueSight — turn GitHub issues into guided tutorials.</span>
+                    <div className="flex flex-wrap items-center gap-4">
+                        <Link href="/" className="hover:text-foreground">Home</Link>
+                        <Link href="/dashboard/issues" className="hover:text-foreground">Submit Issue</Link>
+                        <Link href="/dashboard/tutorials" className="hover:text-foreground">Tutorials</Link>
                     </div>
                 </div>
-            </aside>
-
-            {/* Mobile Header (TODO: Add Sheet/Drawer) */}
-            <div className="flex flex-col flex-1">
-                <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 md:hidden">
-                    <div className="w-full flex-1">
-                        <span className="font-semibold">IssueSight</span>
-                    </div>
-                    <Button variant="ghost" size="icon" onClick={() => logout()}>
-                        <LogOut className="h-4 w-4" />
-                    </Button>
-                </header>
-
-                {/* Main Content */}
-                <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-                    {children}
-                </main>
-            </div>
+            </footer>
         </div>
     );
 }

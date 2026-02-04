@@ -19,6 +19,10 @@ const (
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldCategory holds the string denoting the category field in the database.
+	FieldCategory = "category"
+	// FieldTutorialMarkdown holds the string denoting the tutorial_markdown field in the database.
+	FieldTutorialMarkdown = "tutorial_markdown"
 	// EdgeProjects holds the string denoting the projects edge name in mutations.
 	EdgeProjects = "projects"
 	// EdgeTutorialContents holds the string denoting the tutorial_contents edge name in mutations.
@@ -79,6 +83,8 @@ var Columns = []string{
 	FieldSlug,
 	FieldName,
 	FieldDescription,
+	FieldCategory,
+	FieldTutorialMarkdown,
 }
 
 var (
@@ -130,6 +136,16 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByCategory orders the results by the category field.
+func ByCategory(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCategory, opts...).ToFunc()
+}
+
+// ByTutorialMarkdown orders the results by the tutorial_markdown field.
+func ByTutorialMarkdown(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTutorialMarkdown, opts...).ToFunc()
 }
 
 // ByProjectsCount orders the results by projects count.

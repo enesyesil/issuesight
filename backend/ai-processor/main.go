@@ -7,6 +7,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -35,7 +36,8 @@ func main() {
 	// 1. Load configuration
 	cfg, err := config.Load()
 	if err != nil {
-		panic("failed to load config: " + err.Error())
+		fmt.Fprintf(os.Stderr, "failed to load config: %v\n", err)
+		os.Exit(1)
 	}
 
 	// Use ai-processor-specific port if PORT not set

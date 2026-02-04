@@ -4,17 +4,31 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"net/http"
+
+	httputil "github.com/issuesight/issuesight/internal/platform/http"
 )
+
+// CSRFConfig holds configuration for CSRF middleware.
+type CSRFConfig struct {
+	// SecureCookie sets the Secure flag on cookies (should be true in production)
+	SecureCookie bool
+}
 
 // CSRF implements Double Submit Cookie pattern for CSRF protection.
 type CSRF struct {
-	cookieName  string
-	headerName  string
-	safeMethods map[string]bool
+	cookieName   string
+	headerName   string
+	safeMethods  map[string]bool
+	secureCookie bool
 }
 
-// NewCSRF creates a new CSRF middleware.
+// NewCSRF creates a new CSRF middleware with default settings.
 func NewCSRF() *CSRF {
+	return NewCSRFWithConfig(CSRFConfig{SecureCookie: false})
+}
+
+// NewCSRFWithConfig creates a new CSRF middleware with the given config.
+func NewCSRFWithConfig(cfg CSRFConfig) *CSRF {
 	return &CSRF{
 		cookieName: "csrf_token",
 		headerName: "X-CSRF-Token",
@@ -24,6 +38,7 @@ func NewCSRF() *CSRF {
 			"OPTIONS": true,
 			"TRACE":   true,
 		},
+		secureCookie: cfg.SecureCookie,
 	}
 }
 
@@ -43,7 +58,7 @@ func (c *CSRF) Protect(next http.Handler) http.Handler {
 				Path:     "/",
 				HttpOnly: false, // Must be readable by JS
 				SameSite: http.SameSiteLaxMode,
-				// Secure:   true, // TODO: Enable in production
+				Secure:   c.secureCookie,
 			})
 		} else {
 			token = cookie.Value
@@ -53,14 +68,14 @@ func (c *CSRF) Protect(next http.Handler) http.Handler {
 		if !c.safeMethods[r.Method] {
 			requestToken := r.Header.Get(c.headerName)
 			if requestToken == "" {
-				http.Error(w, "Missing CSRF token", http.StatusForbidden)
+				writeCSRFError(w, http.StatusForbidden, "missing_csrf_token", "CSRF token is required")
 				return
 			}
 
 			// Simple string comparison (Double Submit Cookie)
 			// For higher security, use HMAC binding to session
 			if requestToken != token {
-				http.Error(w, "Invalid CSRF token", http.StatusForbidden)
+				writeCSRFError(w, http.StatusForbidden, "invalid_csrf_token", "CSRF token is invalid")
 				return
 			}
 		}
@@ -69,8 +84,17 @@ func (c *CSRF) Protect(next http.Handler) http.Handler {
 	})
 }
 
+// writeCSRFError writes a JSON error response for CSRF failures.
+func writeCSRFError(w http.ResponseWriter, statusCode int, errorCode, message string) {
+	httputil.WriteError(w, statusCode, errorCode, message)
+}
+
 func generateRandomToken() string {
 	b := make([]byte, 32)
-	rand.Read(b)
+	if _, err := rand.Read(b); err != nil {
+		// This should never happen with crypto/rand, but if it does,
+		// we cannot generate secure tokens
+		panic("crypto/rand failed: " + err.Error())
+	}
 	return base64.URLEncoding.EncodeToString(b)
 }

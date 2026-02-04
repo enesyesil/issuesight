@@ -22,7 +22,6 @@ var (
 	ErrNilClient          = errors.New("llm: client cannot be nil")
 	ErrEmptyResponse      = errors.New("llm: received empty response from LLM")
 	ErrMaxRetriesExceeded = errors.New("llm: max retries exceeded")
-	ErrInvalidAPIKey      = errors.New("llm: invalid API key")
 )
 
 // Config holds configuration for the LLM client wrapper.

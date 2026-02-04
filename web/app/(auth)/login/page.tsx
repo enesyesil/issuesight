@@ -31,8 +31,14 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
-            <Card className="w-full max-w-md shadow-lg">
+        <div className="relative min-h-screen flex items-center justify-center p-4">
+            <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: "url('/hero-sight.png')" }}
+                aria-hidden="true"
+            />
+            <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
+            <Card className="relative z-10 w-full max-w-md shadow-lg bg-background/90 backdrop-blur">
                 <CardHeader className="space-y-1 text-center">
                     <CardTitle className="text-2xl font-bold tracking-tight">Welcome back</CardTitle>
                     <CardDescription>

@@ -17,28 +17,43 @@ import (
 
 // Errors for message transformation.
 var (
-	ErrEmptyPayload = errors.New("transformer: payload cannot be empty")
-	ErrMissingField = errors.New("transformer: required field missing")
+	ErrEmptyPayload   = errors.New("transformer: payload cannot be empty")
+	ErrMissingField   = errors.New("transformer: required field missing")
+	ErrFieldTooLong   = errors.New("transformer: field exceeds maximum length")
+	ErrInvalidPayload = errors.New("transformer: payload validation failed")
+)
+
+// Field length limits to prevent memory issues and ensure reasonable data sizes.
+const (
+	MaxOwnerLength           = 100    // GitHub username max is 39, but allow some buffer
+	MaxRepoLength            = 256    // GitHub repo name max is 100, but allow some buffer
+	MaxTitleLength           = 1024   // Reasonable title length
+	MaxBodyLength            = 500000 // ~500KB body limit (GitHub allows ~65K but may include images)
+	MaxURLLength             = 2048   // Standard URL length limit
+	MaxLanguageLength        = 100    // Programming language name
+	MaxRepoDescriptionLength = 2000   // Repository description length limit
 )
 
 // StreamIssuePayload represents the wire format from Redis stream.
 // This combines data from Issue + Repository + collection metadata.
 // This is NOT a domain type - it's a DTO for the stream message format.
 type StreamIssuePayload struct {
-	IssueID      int64     `json:"issue_id"`
-	IssueNumber  int       `json:"issue_number"`
-	Owner        string    `json:"owner"`
-	Repo         string    `json:"repo"`
-	FullName     string    `json:"full_name"`
-	Title        string    `json:"title"`
-	Body         string    `json:"body"`
-	Labels       []string  `json:"labels"`
-	State        string    `json:"state"`
-	HTMLURL      string    `json:"html_url"`
-	RepoID       int64     `json:"repo_id"`
-	RepoLanguage string    `json:"repo_language"`
-	RepoStars    int       `json:"repo_stars"`
-	CollectedAt  time.Time `json:"collected_at"`
+	IssueID         int64     `json:"issue_id"`
+	IssueNumber     int       `json:"issue_number"`
+	Owner           string    `json:"owner"`
+	Repo            string    `json:"repo"`
+	FullName        string    `json:"full_name"`
+	Title           string    `json:"title"`
+	Body            string    `json:"body"`
+	Labels          []string  `json:"labels"`
+	State           string    `json:"state"`
+	HTMLURL         string    `json:"html_url"`
+	RepoID          int64     `json:"repo_id"`
+	RepoLanguage    string    `json:"repo_language"`
+	RepoStars       int       `json:"repo_stars"`
+	RepoDescription string    `json:"repo_description"`
+	CollectedAt     time.Time `json:"collected_at"`
+	UserID          string    `json:"user_id"` // Requesting user for access control
 }
 
 // ToIssue converts the stream payload to a domain.Issue.
@@ -83,24 +98,52 @@ func TransformStreamMessage(payload map[string]interface{}) (*StreamIssuePayload
 
 	p := &StreamIssuePayload{}
 
-	// Required string fields
+	// Required string fields with length validation
 	var ok bool
 	if p.Owner, ok = getStringField(payload, "owner"); !ok {
 		return nil, fmt.Errorf("%w: owner", ErrMissingField)
 	}
+	if len(p.Owner) > MaxOwnerLength {
+		return nil, fmt.Errorf("%w: owner exceeds %d chars", ErrFieldTooLong, MaxOwnerLength)
+	}
+
 	if p.Repo, ok = getStringField(payload, "repo"); !ok {
 		return nil, fmt.Errorf("%w: repo", ErrMissingField)
 	}
+	if len(p.Repo) > MaxRepoLength {
+		return nil, fmt.Errorf("%w: repo exceeds %d chars", ErrFieldTooLong, MaxRepoLength)
+	}
+
 	if p.Title, ok = getStringField(payload, "title"); !ok {
 		return nil, fmt.Errorf("%w: title", ErrMissingField)
 	}
+	if len(p.Title) > MaxTitleLength {
+		p.Title = p.Title[:MaxTitleLength] // Truncate title instead of failing
+	}
 
-	// Optional string fields (with defaults)
+	// Optional string fields (with defaults and length limits)
 	p.FullName, _ = getStringField(payload, "full_name")
+	// Be resilient: some producers may omit full_name; derive it.
+	if p.FullName == "" {
+		p.FullName = fmt.Sprintf("%s/%s", p.Owner, p.Repo)
+	}
 	p.Body, _ = getStringField(payload, "body")
+	if len(p.Body) > MaxBodyLength {
+		p.Body = p.Body[:MaxBodyLength] // Truncate body instead of failing
+	}
 	p.State, _ = getStringField(payload, "state")
 	p.HTMLURL, _ = getStringField(payload, "html_url")
+	if len(p.HTMLURL) > MaxURLLength {
+		p.HTMLURL = p.HTMLURL[:MaxURLLength]
+	}
 	p.RepoLanguage, _ = getStringField(payload, "repo_language")
+	if len(p.RepoLanguage) > MaxLanguageLength {
+		p.RepoLanguage = p.RepoLanguage[:MaxLanguageLength]
+	}
+	p.RepoDescription, _ = getStringField(payload, "repo_description")
+	if len(p.RepoDescription) > MaxRepoDescriptionLength {
+		p.RepoDescription = p.RepoDescription[:MaxRepoDescriptionLength]
+	}
 
 	// Required numeric fields
 	var err error
@@ -134,6 +177,9 @@ func TransformStreamMessage(payload map[string]interface{}) (*StreamIssuePayload
 	} else {
 		p.CollectedAt = time.Now().UTC()
 	}
+
+	// Parse user_id (optional - for access control)
+	p.UserID, _ = getStringField(payload, "user_id")
 
 	return p, nil
 }

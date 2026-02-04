@@ -4,7 +4,6 @@ package github
 
 import (
 	"errors"
-	"fmt"
 )
 
 // Sentinel errors for GitHub API operations.
@@ -37,27 +36,3 @@ var (
 	// ErrInvalidIssueNumber is returned when issue number is <= 0.
 	ErrInvalidIssueNumber = errors.New("github: issue number must be positive")
 )
-
-// APIError wraps a GitHub API error with additional context.
-type APIError struct {
-	StatusCode int
-	Message    string
-	Err        error
-}
-
-func (e *APIError) Error() string {
-	return fmt.Sprintf("github api error (status %d): %s", e.StatusCode, e.Message)
-}
-
-func (e *APIError) Unwrap() error {
-	return e.Err
-}
-
-// NewAPIError creates a new APIError with the given status code and message.
-func NewAPIError(statusCode int, message string, underlying error) *APIError {
-	return &APIError{
-		StatusCode: statusCode,
-		Message:    message,
-		Err:        underlying,
-	}
-}

@@ -7,12 +7,13 @@ import (
 )
 
 // TutorialStatus represents the generation state of a tutorial.
+// Values match the Ent schema enum (lowercase).
 type TutorialStatus string
 
 const (
-	StatusPending   TutorialStatus = "PENDING"
-	StatusCompleted TutorialStatus = "COMPLETED"
-	StatusFailed    TutorialStatus = "FAILED"
+	StatusPending   TutorialStatus = "pending"
+	StatusCompleted TutorialStatus = "completed"
+	StatusFailed    TutorialStatus = "failed"
 )
 
 // TutorialRequest is what a user submits to generate a tutorial.

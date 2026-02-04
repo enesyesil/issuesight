@@ -5,12 +5,13 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/issuesight/issuesight/backend/gateway/auth"
 	"github.com/issuesight/issuesight/backend/gateway/handler"
 	"github.com/issuesight/issuesight/backend/gateway/middleware"
+	"github.com/issuesight/issuesight/internal/config"
 	"github.com/issuesight/issuesight/internal/platform/cache"
 	"github.com/issuesight/issuesight/internal/platform/db/ent"
-	"github.com/issuesight/issuesight/internal/platform/lock"
-	"github.com/issuesight/issuesight/internal/platform/stream"
+	"github.com/issuesight/issuesight/internal/platform/log"
 	"github.com/redis/go-redis/v9"
 	httpSwagger "github.com/swaggo/http-swagger"
 
@@ -37,11 +38,10 @@ func DefaultServerConfig(port string) ServerConfig {
 
 // ServerDeps holds dependencies for the HTTP server.
 type ServerDeps struct {
-	Redis     *redis.Client
-	DB        *ent.Client
-	Cache     cache.Cache
-	Locker    lock.Locker
-	Publisher stream.Publisher
+	Redis        *redis.Client
+	DB           *ent.Client
+	Cache        cache.Cache
+	CollectorURL string // URL for the collector service
 }
 
 // NewServer creates and configures the HTTP server.
@@ -64,31 +64,49 @@ type ServerDeps struct {
 // @in header
 // @name Authorization
 func NewServer(cfg ServerConfig, deps ServerDeps) *http.Server {
+	// Load app config for middleware settings
+	appCfg, _ := config.Load()
+
 	mux := http.NewServeMux()
 
 	// Register routes
 	registerRoutes(mux, deps)
 
-	// Initialize Rate Limiter (e.g., 60 requests per minute)
-	rateLimiter := middleware.NewRateLimiter(deps.Redis, 60, time.Minute)
+	// Rate limiter: disabled when RATE_LIMIT_REQUESTS <= 0 (e.g. for testing)
+	var rateLimiter *middleware.RateLimiter
+	if appCfg.RateLimitRequests > 0 && appCfg.RateLimitWindow > 0 {
+		rateLimiter = middleware.NewRateLimiter(deps.Redis, appCfg.RateLimitRequests, appCfg.RateLimitWindow)
+	}
 
-	// Initialize CSRF Protection
-	csrf := middleware.NewCSRF()
+	// Initialize CSRF Protection with secure cookies in production
+	csrf := middleware.NewCSRFWithConfig(middleware.CSRFConfig{
+		SecureCookie: appCfg.IsProduction(),
+	})
 
-	// Apply middleware chain: Recovery -> SecurityHeaders -> Logging -> RateLimit -> CSRF -> Handler
-	// Order matters! Security headers should be outer-most (after recovery), CSRF inner-most (closest to handler).
-	// Actually typical order: Recovery -> Logger -> Security -> ... -> Handler
+	// Initialize CORS with configured origins
+	cors := middleware.NewCORSWithConfig(middleware.CORSConfig{
+		AllowedOrigins: appCfg.CORSOrigins,
+	})
 
+	// Initialize Security Headers with HSTS in production
+	securityHeaders := middleware.NewSecurityHeadersWithConfig(middleware.SecurityConfig{
+		EnableHSTS: appCfg.IsProduction(),
+	})
+
+	// Apply middleware chain: Recovery -> CORS -> SecurityHeaders -> Logging -> [RateLimit] -> CSRF -> Handler
+	// Order matters! Recovery should be outermost, CSRF innermost.
 	var finalHandler http.Handler = mux
 
 	// Inner middlewares
 	finalHandler = csrf.Protect(finalHandler)
-	finalHandler = rateLimiter.Limit(finalHandler)
+	if rateLimiter != nil {
+		finalHandler = rateLimiter.Limit(finalHandler)
+	}
 
 	// Outer middlewares
 	finalHandler = middleware.Logging(finalHandler)
-	finalHandler = middleware.SecurityHeaders(finalHandler) // Add security headers
-	finalHandler = middleware.CORS(finalHandler)            // Add CORS headers
+	finalHandler = securityHeaders.Handler(finalHandler)
+	finalHandler = cors.Handler(finalHandler)
 	finalHandler = middleware.Recovery(finalHandler)
 
 	return &http.Server{
@@ -102,21 +120,55 @@ func NewServer(cfg ServerConfig, deps ServerDeps) *http.Server {
 
 // registerRoutes sets up all HTTP routes.
 func registerRoutes(mux *http.ServeMux, deps ServerDeps) {
+	appCfg, _ := config.Load()
+	authMiddleware := middleware.NewAuthMiddleware(middleware.JWTConfig{
+		Secret:     appCfg.JWTSecret,
+		Expiration: appCfg.JWTExpiration,
+	})
+	quotaMiddleware := middleware.NewQuotaMiddleware(deps.DB)
+	if appCfg.QuotaDailyLimit > 0 {
+		quotaMiddleware = quotaMiddleware.WithLimit(appCfg.QuotaDailyLimit)
+	}
+
 	// Health endpoint (no auth required)
 	healthHandler := handler.NewHealthHandler(deps.Redis, deps.DB)
 	mux.HandleFunc("/health", healthHandler.Health())
 
-	// Issue submission endpoint
-	issueHandler := handler.NewIssueHandler(deps.Publisher, deps.Locker, deps.Cache, deps.DB)
-	mux.HandleFunc("POST /api/issues", issueHandler.Submit())
+	// Issue submission endpoint (auth + quota when QuotaDailyLimit > 0)
+	issueHandler := handler.NewIssueHandler(deps.CollectorURL, deps.Cache, deps.DB)
+	var issueChain http.Handler = issueHandler.Submit()
+	if appCfg.QuotaDailyLimit > 0 {
+		issueChain = quotaMiddleware.EnforceQuota(issueChain)
+	}
+	issueChain = authMiddleware.RequireAuth(issueChain)
+	mux.Handle("POST /api/issues", issueChain)
+
+	// Quota endpoint (auth only); 0 = unlimited
+	quotaHandler := handler.NewQuotaHandler(deps.DB).WithLimit(appCfg.QuotaDailyLimit)
+	mux.Handle("GET /api/quota", authMiddleware.RequireAuth(quotaHandler.Get()))
 
 	// Tutorial endpoints
 	tutorialHandler := handler.NewTutorialHandler(deps.Cache, deps.DB)
-	mux.HandleFunc("GET /api/tutorials/{id}", tutorialHandler.Get())
-	mux.HandleFunc("GET /api/tutorials", tutorialHandler.List())
+	mux.Handle("GET /api/tutorials/{id}", authMiddleware.RequireAuth(tutorialHandler.Get()))
+	mux.Handle("GET /api/tutorials", authMiddleware.RequireAuth(tutorialHandler.List()))
+
+	// Concept endpoints (public)
+	conceptHandler := handler.NewConceptHandler(deps.DB)
+	mux.Handle("GET /api/concepts", conceptHandler.List())
+	mux.Handle("GET /api/concepts/{slug}", conceptHandler.Get())
+
+	// Create Redis state store for OAuth (production-ready)
+	stateStore, err := auth.NewRedisStateStore(deps.Redis)
+	if err != nil {
+		log.Warn("failed to create Redis state store, falling back to in-memory", "error", err)
+		stateStore = nil // Will use in-memory fallback
+	}
 
 	// Auth endpoints
-	authHandler := handler.NewAuthHandler(deps.DB)
+	authHandler := handler.NewAuthHandler(handler.AuthHandlerConfig{
+		DB:         deps.DB,
+		StateStore: stateStore,
+	})
 	mux.HandleFunc("GET /api/auth/github", authHandler.GitHub())
 	mux.HandleFunc("GET /api/auth/google", authHandler.Google())
 	mux.HandleFunc("GET /api/auth/callback", authHandler.Callback())

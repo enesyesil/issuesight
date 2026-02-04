@@ -1,6 +1,7 @@
 package transformer
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/issuesight/issuesight/internal/domain"
@@ -71,6 +72,12 @@ Some content.`,
 			wantTitle: "Delayed Title",
 			wantErr:   false,
 		},
+		{
+			name:      "json envelope with markdown",
+			input:     `{"title":"JSON Title","prerequisites":["Go","Redis Streams"],"markdown":"# JSON Title\n\n## Prerequisites (Keywords)\n- Go\n- Redis Streams\n\n## Context\n- Example"}`,
+			wantTitle: "JSON Title",
+			wantErr:   false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -93,6 +100,24 @@ Some content.`,
 				}
 			}
 		})
+	}
+}
+
+func TestParseLLMOutputWithPrereqs_JSON(t *testing.T) {
+	input := `{"title":"JSON Title","prerequisites":["Go","Redis Streams"],"markdown":"# JSON Title\n\n## Prerequisites (Keywords)\n- Go\n- Redis Streams\n\n## Context\n- Example"}`
+
+	tutorial, prereqs, err := ParseLLMOutputWithPrereqs(input)
+	if err != nil {
+		t.Fatalf("ParseLLMOutputWithPrereqs() error = %v", err)
+	}
+	if tutorial.Title != "JSON Title" {
+		t.Fatalf("Title = %q, want %q", tutorial.Title, "JSON Title")
+	}
+	if len(prereqs) != 2 {
+		t.Fatalf("Prerequisites length = %d, want 2", len(prereqs))
+	}
+	if prereqs[0] != "Go" || prereqs[1] != "Redis Streams" {
+		t.Fatalf("Prerequisites = %v, want [Go Redis Streams]", prereqs)
 	}
 }
 
@@ -181,5 +206,85 @@ func TestValidateTutorialContent(t *testing.T) {
 				t.Errorf("ValidateTutorialContent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
+	}
+}
+
+func TestAutoFixTutorialMarkdown(t *testing.T) {
+	input := `# Sample Tutorial
+
+## Context
+This is the context.
+
+## Setup
+Some setup steps.
+
+## Step 1 — Do the thing
+**Goal:** Do it.
+**Why:** It matters.
+**What to do:** Follow the steps.
+**Checkpoint:** It works.`
+
+	fixed := AutoFixTutorialMarkdown(input)
+
+	requiredSections := []string{
+		"## Context",
+		"## Plan",
+		"## Assumptions",
+		"## Testing",
+		"## Pitfalls",
+		"## Summary",
+	}
+
+	for _, section := range requiredSections {
+		if !strings.Contains(fixed, section) {
+			t.Fatalf("AutoFixTutorialMarkdown missing section %q", section)
+		}
+	}
+
+	if !strings.Contains(fixed, "## Step 2") || !strings.Contains(fixed, "## Step 3") {
+		t.Fatalf("AutoFixTutorialMarkdown should add missing steps; got:\n%s", fixed)
+	}
+}
+
+func TestValidateTutorialMarkdown(t *testing.T) {
+	valid := `# Title
+
+## Step 1 — First
+**Goal:** A
+**Why:** B
+**What to do:** C
+**Checkpoint:** D
+
+## Step 2 — Second
+**Goal:** A
+**Why:** B
+**What to do:** C
+**Checkpoint:** D
+
+## Step 3 — Third
+**Goal:** A
+**Why:** B
+**What to do:** C
+**Checkpoint:** D`
+
+	if err := ValidateTutorialMarkdown(valid); err != nil {
+		t.Fatalf("ValidateTutorialMarkdown unexpected error: %v", err)
+	}
+
+	invalid := `# Title
+
+## Step 1 — First
+**Goal:** A
+**Why:** B
+**What to do:** C
+**Checkpoint:** D
+
+## Step 2 — Second
+**Goal:** A
+**Why:** B
+**What to do:** C`
+
+	if err := ValidateTutorialMarkdown(invalid); err == nil {
+		t.Fatalf("ValidateTutorialMarkdown expected error, got nil")
 	}
 }

@@ -13,6 +13,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
+	"strings"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -156,7 +158,8 @@ func (c *RedisConsumer) CreateGroup(ctx context.Context, stream, group string) e
 	err := c.client.XGroupCreateMkStream(ctx, stream, group, "0").Err()
 
 	// Ignore the "already exists" error - actually it's not really an error for us
-	if err != nil && err.Error() != "BUSYGROUP Consumer Group name already exists" {
+	// Use strings.Contains for more robust error matching across Redis versions
+	if err != nil && !strings.Contains(err.Error(), "BUSYGROUP") {
 		return fmt.Errorf("failed to create consumer group %s for stream %s: %w", group, stream, err)
 	}
 	return nil
@@ -258,20 +261,21 @@ func (c *RedisConsumer) Consume(ctx context.Context, stream, group, consumer str
 				// Call the user's handler function to process the message
 				// This is where your business logic goes!
 				if err := handler(message); err != nil {
-					// Handler failed - we return the error and stop processing.
-					// The message is NOT acknowledged, so it can be retried.
-					
-					// In a production system, you might want to:
-					//   - Log the error and continue
-					//   - Move to a "dead letter queue" after N retries
-					
-					return fmt.Errorf("handler error for message %s: %w", msg.ID, err)
+					// Handler failed - log the error and continue processing.
+					// The message is NOT acknowledged, so it remains pending.
+					// It can be reclaimed later via XAUTOCLAIM or XPENDING.
+					//
+					// We continue processing other messages instead of stopping
+					// the entire consumer - this is more resilient in production.
+					c.logHandlerError(stream, msg.ID, err)
+					continue
 				}
 
 				// Handler succeeded! Acknowledge the message so Redis knows
 				// we're done with it and doesn't redeliver it.
 				if err := c.Ack(ctx, stream, group, msg.ID); err != nil {
-					return fmt.Errorf("failed to ack message %s: %w", msg.ID, err)
+					// Log ack error but continue - the message will be retried
+					c.logAckError(stream, msg.ID, err)
 				}
 			}
 		}
@@ -312,4 +316,22 @@ func (c *RedisConsumer) Ack(ctx context.Context, stream, group, messageID string
 		return fmt.Errorf("failed to ack message %s: %w", messageID, err)
 	}
 	return nil
+}
+
+// logHandlerError logs a handler error without stopping the consumer.
+func (c *RedisConsumer) logHandlerError(stream, messageID string, err error) {
+	slog.Error("stream handler error",
+		"stream", stream,
+		"message_id", messageID,
+		"error", err,
+	)
+}
+
+// logAckError logs an ack error without stopping the consumer.
+func (c *RedisConsumer) logAckError(stream, messageID string, err error) {
+	slog.Error("stream ack error",
+		"stream", stream,
+		"message_id", messageID,
+		"error", err,
+	)
 }
