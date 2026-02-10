@@ -32,7 +32,7 @@ type Config struct {
 	// LLM (provider-agnostic via LangChain)
 	LLMProvider    string  // "openai", "anthropic", "ollama", "gemini", "cohere"
 	LLMAPIKey      string  // API key for the provider
-	LLMModel       string  // e.g., "gpt-4o", "claude-3-opus"
+	LLMModel       string  // e.g., "gpt-5", "claude-3-opus"
 	LLMBaseURL     string  // for Ollama or custom endpoints
 	LLMTemperature float64 // 0.0 - 1.0
 	LLMMaxTokens   int
@@ -90,7 +90,7 @@ func Load() (*Config, error) {
 		// LLM
 		LLMProvider:    getEnv("LLM_PROVIDER", "openai"),
 		LLMAPIKey:      getEnv("LLM_API_KEY", ""),
-		LLMModel:       getEnv("LLM_MODEL", "gpt-4o"),
+		LLMModel:       getEnv("LLM_MODEL", "gpt-5"),
 		LLMBaseURL:     getEnv("LLM_BASE_URL", ""),
 		LLMTemperature: getEnvFloat("LLM_TEMPERATURE", 0.7),
 		LLMMaxTokens:   getEnvInt("LLM_MAX_TOKENS", 4096),

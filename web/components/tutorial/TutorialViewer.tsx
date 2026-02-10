@@ -6,7 +6,8 @@ import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Check, ChevronRight, BookOpen } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Check, ChevronRight, BookOpen, Copy } from 'lucide-react';
 import { cn, slugify } from '@/lib/utils';
 import {
   parseTutorialContent,
@@ -84,6 +85,7 @@ export function TutorialViewer({
   const [completedStepIds, setCompletedStepIds] = useState<Set<string>>(() =>
     getStoredProgress(tutorialId)
   );
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   useEffect(() => {
     setCompletedStepIds(getStoredProgress(tutorialId));
@@ -104,6 +106,23 @@ export function TutorialViewer({
     },
     [tutorialId]
   );
+
+  const handleCopyMarkdown = useCallback(async () => {
+    if (typeof window === 'undefined' || !navigator?.clipboard) {
+      setCopyStatus('error');
+      setTimeout(() => setCopyStatus('idle'), 2000);
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(content || '');
+      setCopyStatus('success');
+    } catch {
+      setCopyStatus('error');
+    }
+
+    setTimeout(() => setCopyStatus('idle'), 2000);
+  }, [content]);
 
   const { prerequisites, sections, steps } = parsed;
   const hasSteps = steps.length > 0;
@@ -130,6 +149,24 @@ export function TutorialViewer({
 
   return (
     <div className="flex flex-col gap-6">
+      <div className="flex justify-end">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleCopyMarkdown}
+          className="gap-2"
+          aria-label="Copy tutorial as markdown"
+        >
+          <Copy className="h-4 w-4" />
+          {copyStatus === 'success'
+            ? 'Copied Markdown'
+            : copyStatus === 'error'
+              ? 'Copy Failed'
+              : 'Copy Markdown'}
+        </Button>
+      </div>
+
       {/* Prerequisite concepts – above the step cards; each links to concept detail page */}
       {hasConcepts && (
         <Card className="border-border bg-card dark:bg-card">

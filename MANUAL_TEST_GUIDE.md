@@ -93,6 +93,7 @@ After running `npm run dev`, use this checklist to verify the theme, tutorial pa
 - [ ] **Back link:** “Back to Dashboard” with arrow is visible; click it → lands on `/dashboard/tutorials`.
 - [ ] **Metadata row:** “Tutorial” tag (muted green), “X min read”, and date (with clock icon) are visible.
 - [ ] **Copy Link:** Click → paste elsewhere → same URL; “Copied” appears briefly.
+- [ ] **Copy Markdown:** Click in tutorial viewer → paste into a text editor → markdown content is copied.
 - [ ] **Bookmark:** Click to bookmark → refresh page → bookmark state persists; click again to remove → refresh → state cleared.
 - [ ] **Share:** Click → share sheet (if supported) or same as Copy Link; no crash.
 

@@ -288,3 +288,102 @@ func TestValidateTutorialMarkdown(t *testing.T) {
 		t.Fatalf("ValidateTutorialMarkdown expected error, got nil")
 	}
 }
+
+func TestValidateTutorialMarkdownV2(t *testing.T) {
+	valid := `## 0) Issue Understanding (Ground Truth)
+- Notes
+
+## 1) Before You Start: What You Must Know
+### 1.1 Concepts (repo + issue specific)
+- **Concept:** Redis Streams
+- **Concept:** Go
+
+### 1.2 Tooling you must be able to use
+- go test
+
+## 2) Safety Rules (Non-Negotiable)
+- Keep diff minimal
+
+## 3) Repo Recon Plan (Read-Only First)
+- Recon
+
+## 4) Reproduction + Baseline
+- Repro steps
+
+## 5) Implementation Plan (Codex-Drivable Steps)
+### Step 1 — Add validation
+**Intent:** Add checks.
+
+## 6) Testing Strategy
+- Test plan
+
+## 7) PR Checklist (Maintainer-Friendly)
+- Checklist
+
+## 8) Fallbacks + “If You Get Stuck”
+- Fallback`
+
+	if err := ValidateTutorialMarkdownV2(valid); err != nil {
+		t.Fatalf("ValidateTutorialMarkdownV2 unexpected error: %v", err)
+	}
+
+	missingSection := strings.Replace(valid, "## 4) Reproduction + Baseline\n- Repro steps\n\n", "", 1)
+	if err := ValidateTutorialMarkdownV2(missingSection); err == nil {
+		t.Fatalf("ValidateTutorialMarkdownV2 expected missing section error")
+	}
+
+	missingStep := strings.Replace(valid, "### Step 1 — Add validation\n**Intent:** Add checks.\n\n", "**Intent:** Add checks.\n\n", 1)
+	if err := ValidateTutorialMarkdownV2(missingStep); err == nil {
+		t.Fatalf("ValidateTutorialMarkdownV2 expected missing step error")
+	}
+}
+
+func TestParseLLMOutputWithPrereqs_V2ConceptSection(t *testing.T) {
+	input := `## 0) Issue Understanding (Ground Truth)
+- Info
+
+## 1) Before You Start: What You Must Know
+### 1.1 Concepts (repo + issue specific)
+- **Concept:** Redis Streams
+- **Concept:** Go
+- **Concept:** Redis Streams
+
+### 1.2 Tooling you must be able to use
+- go test
+
+## 2) Safety Rules (Non-Negotiable)
+- Safe
+
+## 3) Repo Recon Plan (Read-Only First)
+- Recon
+
+## 4) Reproduction + Baseline
+- Repro
+
+## 5) Implementation Plan (Codex-Drivable Steps)
+### Step 1 — Implement
+Details
+
+## 6) Testing Strategy
+- Tests
+
+## 7) PR Checklist (Maintainer-Friendly)
+- PR
+
+## 8) Fallbacks + “If You Get Stuck”
+- Help`
+
+	tutorial, prereqs, err := ParseLLMOutputWithPrereqs(input)
+	if err != nil {
+		t.Fatalf("ParseLLMOutputWithPrereqs() error = %v", err)
+	}
+	if tutorial == nil {
+		t.Fatalf("tutorial should not be nil")
+	}
+	if len(prereqs) != 2 {
+		t.Fatalf("prerequisites length = %d, want 2", len(prereqs))
+	}
+	if prereqs[0] != "Redis Streams" || prereqs[1] != "Go" {
+		t.Fatalf("prerequisites = %v, want [Redis Streams Go]", prereqs)
+	}
+}
