@@ -4,6 +4,7 @@ package transformer
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -15,6 +16,10 @@ var (
 	ErrEmptyOutput = errors.New("transformer: LLM output cannot be empty")
 	ErrNoTitle     = errors.New("transformer: could not extract title from output")
 	ErrEmptyBody   = errors.New("transformer: tutorial body is empty")
+
+	ErrTutorialV2MissingSection = errors.New("transformer: tutorial v2 missing required section")
+	ErrTutorialV2SectionOrder   = errors.New("transformer: tutorial v2 sections out of order")
+	ErrTutorialV2MissingStep    = errors.New("transformer: tutorial v2 implementation plan must include at least one step")
 )
 
 // ParseLLMOutput extracts structured tutorial content from raw LLM response.
@@ -171,21 +176,28 @@ func parsePrerequisites(raw json.RawMessage) []string {
 func extractPrerequisitesFromMarkdown(markdown string) []string {
 	lines := strings.Split(markdown, "\n")
 	inSection := false
+	sectionLevel := 0
 	var items []string
 
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
-		if strings.HasPrefix(trimmed, "## ") {
-			title := strings.ToLower(strings.TrimSpace(strings.TrimPrefix(trimmed, "## ")))
-			if strings.Contains(title, "prereq") || strings.Contains(title, "concept") || strings.Contains(title, "key") {
+		if level, title, ok := parseMarkdownHeading(trimmed); ok {
+			titleLower := strings.ToLower(strings.TrimSpace(title))
+			if isConceptSectionHeading(titleLower) {
 				inSection = true
+				sectionLevel = level
 				continue
 			}
-			if inSection {
+			if inSection && level <= sectionLevel {
 				break
 			}
 		}
 		if !inSection || trimmed == "" {
+			continue
+		}
+
+		if concept, ok := extractConceptField(trimmed); ok {
+			items = append(items, concept)
 			continue
 		}
 
@@ -203,6 +215,75 @@ func extractPrerequisitesFromMarkdown(markdown string) []string {
 	}
 
 	return items
+}
+
+func parseMarkdownHeading(line string) (int, string, bool) {
+	if !strings.HasPrefix(line, "#") {
+		return 0, "", false
+	}
+
+	level := 0
+	for level < len(line) && line[level] == '#' {
+		level++
+	}
+	if level == 0 || level >= len(line) || line[level] != ' ' {
+		return 0, "", false
+	}
+
+	title := strings.TrimSpace(line[level+1:])
+	if title == "" {
+		return 0, "", false
+	}
+
+	return level, title, true
+}
+
+func isConceptSectionHeading(titleLower string) bool {
+	return strings.Contains(titleLower, "1.1 concepts") ||
+		strings.Contains(titleLower, "prereq") ||
+		strings.Contains(titleLower, "concepts") ||
+		strings.Contains(titleLower, "key concepts")
+}
+
+func extractConceptField(line string) (string, bool) {
+	item, ok := trimListPrefix(line)
+	if !ok {
+		return "", false
+	}
+
+	raw := strings.TrimSpace(item)
+	lower := strings.ToLower(raw)
+	prefixes := []string{
+		"**concept:**",
+		"**concept**:",
+		"concept:",
+	}
+
+	for _, prefix := range prefixes {
+		if strings.HasPrefix(lower, prefix) {
+			value := strings.TrimSpace(raw[len(prefix):])
+			if value != "" {
+				return value, true
+			}
+		}
+	}
+
+	return "", false
+}
+
+func trimListPrefix(line string) (string, bool) {
+	trimmed := strings.TrimSpace(line)
+	switch {
+	case strings.HasPrefix(trimmed, "- "):
+		return strings.TrimSpace(strings.TrimPrefix(trimmed, "- ")), true
+	case strings.HasPrefix(trimmed, "* "):
+		return strings.TrimSpace(strings.TrimPrefix(trimmed, "* ")), true
+	default:
+		if idx := strings.Index(trimmed, ". "); idx > 0 && idx < 4 {
+			return strings.TrimSpace(trimmed[idx+2:]), true
+		}
+	}
+	return "", false
 }
 
 func normalizePrerequisites(raw []string) []string {
@@ -440,6 +521,94 @@ func ValidateTutorialMarkdown(markdown string) error {
 	}
 
 	return nil
+}
+
+var tutorialV2SectionSequence = []int{0, 1, 2, 3, 4, 5, 6, 7, 8}
+
+// ValidateTutorialMarkdownV2 validates the numbered tutorial format from prompt template v2.
+func ValidateTutorialMarkdownV2(markdown string) error {
+	trimmed := strings.TrimSpace(markdown)
+	if trimmed == "" {
+		return ErrEmptyBody
+	}
+
+	lines := strings.Split(trimmed, "\n")
+	expectedIdx := 0
+	inSection5 := false
+	hasStepInSection5 := false
+
+	for _, line := range lines {
+		level, title, ok := parseMarkdownHeading(strings.TrimSpace(line))
+		if !ok {
+			continue
+		}
+
+		if level == 3 && inSection5 {
+			titleLower := strings.ToLower(strings.TrimSpace(title))
+			if strings.HasPrefix(titleLower, "step ") {
+				hasStepInSection5 = true
+			}
+			continue
+		}
+
+		if level != 2 {
+			continue
+		}
+
+		if inSection5 && !hasStepInSection5 {
+			return ErrTutorialV2MissingStep
+		}
+		inSection5 = false
+
+		if expectedIdx >= len(tutorialV2SectionSequence) {
+			return fmt.Errorf("%w: unexpected extra section %q", ErrTutorialV2SectionOrder, title)
+		}
+
+		number, ok := parseTutorialSectionNumber(title)
+		if !ok {
+			return fmt.Errorf("%w: section heading %q", ErrTutorialV2SectionOrder, title)
+		}
+
+		expected := tutorialV2SectionSequence[expectedIdx]
+		if number != expected {
+			return fmt.Errorf("%w: expected %d) got %d)", ErrTutorialV2SectionOrder, expected, number)
+		}
+
+		if number == 5 {
+			inSection5 = true
+			hasStepInSection5 = false
+		}
+
+		expectedIdx++
+	}
+
+	if expectedIdx < len(tutorialV2SectionSequence) {
+		return fmt.Errorf("%w: expected section %d)", ErrTutorialV2MissingSection, tutorialV2SectionSequence[expectedIdx])
+	}
+
+	if inSection5 && !hasStepInSection5 {
+		return ErrTutorialV2MissingStep
+	}
+
+	return nil
+}
+
+func parseTutorialSectionNumber(title string) (int, bool) {
+	closingIdx := strings.Index(title, ")")
+	if closingIdx <= 0 {
+		return 0, false
+	}
+
+	numberPart := strings.TrimSpace(title[:closingIdx])
+	if numberPart == "" {
+		return 0, false
+	}
+
+	n, err := strconv.Atoi(numberPart)
+	if err != nil {
+		return 0, false
+	}
+	return n, true
 }
 
 type mdBlock struct {

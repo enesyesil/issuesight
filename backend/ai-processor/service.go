@@ -234,13 +234,26 @@ func (s *Service) handleMessage(msg stream.Message) error {
 		return nil // Don't retry parsing failures, but keep FAILED record.
 	}
 
-	// 5b. Auto-fix tutorial markdown to enforce required structure.
-	tutorial.MarkdownBody = transformer.AutoFixTutorialMarkdown(tutorial.MarkdownBody)
-	if err := transformer.ValidateTutorialMarkdown(tutorial.MarkdownBody); err != nil {
-		s.logger.Warn("tutorial markdown validation failed after auto-fix",
+	// 5b. Validate the new numbered structure first, then fall back to legacy format checks.
+	if err := transformer.ValidateTutorialMarkdownV2(tutorial.MarkdownBody); err != nil {
+		s.logger.Warn("tutorial markdown did not match v2 structure, attempting legacy fallback",
 			"issue_id", payload.IssueID,
 			"error", err,
 		)
+
+		legacyMarkdown := transformer.AutoFixTutorialMarkdown(tutorial.MarkdownBody)
+		if legacyErr := transformer.ValidateTutorialMarkdown(legacyMarkdown); legacyErr != nil {
+			s.logger.Warn("tutorial markdown failed both v2 and legacy validation; preserving raw output",
+				"issue_id", payload.IssueID,
+				"v2_error", err,
+				"legacy_error", legacyErr,
+			)
+		} else {
+			tutorial.MarkdownBody = legacyMarkdown
+			s.logger.Info("applied legacy tutorial markdown fallback",
+				"issue_id", payload.IssueID,
+			)
+		}
 	}
 
 	// 6. Persist to database
@@ -295,9 +308,10 @@ func (s *Service) generateTutorial(ctx context.Context, payload *transformer.Str
 	timeoutCtx, cancel := context.WithTimeout(ctx, llmCallTimeout)
 	defer cancel()
 
+	systemPrompt := llm.BuildSystemPrompt(payload.HTMLURL)
 	userPrompt := llm.BuildUserPrompt(payload)
 
-	return s.llmClient.GenerateWithSystem(timeoutCtx, llm.SystemPrompt, userPrompt)
+	return s.llmClient.GenerateWithSystem(timeoutCtx, systemPrompt, userPrompt)
 }
 
 // startProjectConceptSync kicks off a best-effort background sync for project concepts.

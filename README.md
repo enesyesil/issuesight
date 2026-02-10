@@ -279,8 +279,10 @@ Go was selected for its native concurrency primitives (`goroutines`), which are 
 | **Database** | PostgreSQL 16 | ACID compliance with JSONB support. |
 | **Message Broker** | Redis Streams | Lightweight, low-latency event buffering. |
 | **Caching** | Redis KV | High-speed read access for API endpoints. |
-| **AI Layer** | OpenAI GPT-4o | Context analysis and prerequisite generation. |
+| **AI Layer** | OpenAI GPT-5 | Context analysis and prerequisite generation. |
 | **Infrastructure** | Docker Compose | Reproducible local development environment. |
+
+Default model is configured via `LLM_MODEL=gpt-5`. If needed, roll back with `LLM_MODEL=gpt-4o`.
 
 ---
 
@@ -298,7 +300,6 @@ issuesight/
 │   └── domain/           # Shared domain types
 └── deployments/           # Docker Compose & Environment Configs
 ```
-
 
 
 

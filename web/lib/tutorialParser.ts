@@ -29,7 +29,7 @@ const PREREQUISITE_HEADINGS = [
   'before you begin',
   'before we start',
   'what you need',
-  'what you\'ll need',
+  "what you'll need",
   'required knowledge',
   'prior knowledge',
   'assumed knowledge',
@@ -46,8 +46,68 @@ const SECTION_HEADINGS = [
   'summary',
 ];
 
+type HeadingBlock = {
+  title: string;
+  normalizedTitle: string;
+  content: string;
+};
+
 function normalizeHeading(text: string): string {
   return text.replace(/#/g, '').trim().toLowerCase();
+}
+
+function parseV2SectionNumber(title: string): number | null {
+  const match = title.trim().match(/^(\d+)\)/);
+  if (!match) return null;
+  const number = Number.parseInt(match[1], 10);
+  return Number.isNaN(number) ? null : number;
+}
+
+function splitByHeadings(markdown: string): HeadingBlock[] {
+  const blocks: HeadingBlock[] = [];
+  const normalized = markdown.trimStart().replace(/^(#)\s/m, '## ');
+  const parts = normalized.split(/(?=^##\s)/m);
+
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+
+    const firstLineEnd = trimmed.indexOf('\n');
+    const firstLine = firstLineEnd === -1 ? trimmed : trimmed.slice(0, firstLineEnd);
+    const rawTitle = firstLine.replace(/^##\s*/, '').trim();
+    const content = firstLineEnd === -1 ? '' : trimmed.slice(firstLineEnd + 1).trim();
+
+    blocks.push({
+      title: rawTitle,
+      normalizedTitle: normalizeHeading(rawTitle),
+      content,
+    });
+  }
+
+  return blocks;
+}
+
+function splitBySubheadings(content: string): HeadingBlock[] {
+  const blocks: HeadingBlock[] = [];
+  const parts = content.trim().split(/(?=^###\s)/m);
+
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (!trimmed.startsWith('### ')) continue;
+
+    const firstLineEnd = trimmed.indexOf('\n');
+    const firstLine = firstLineEnd === -1 ? trimmed : trimmed.slice(0, firstLineEnd);
+    const rawTitle = firstLine.replace(/^###\s*/, '').trim();
+    const body = firstLineEnd === -1 ? '' : trimmed.slice(firstLineEnd + 1).trim();
+
+    blocks.push({
+      title: rawTitle,
+      normalizedTitle: normalizeHeading(rawTitle),
+      content: body,
+    });
+  }
+
+  return blocks;
 }
 
 function extractListItems(block: string): string[] {
@@ -55,26 +115,36 @@ function extractListItems(block: string): string[] {
   const seen = new Set<string>();
   const add = (s: string) => {
     const t = s.trim();
-    if (t && t.length <= 80 && !seen.has(t.toLowerCase())) {
-      seen.add(t.toLowerCase());
-      items.push(t);
-    }
+    if (!t || t.length > 80) return;
+    const key = t.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    items.push(t);
   };
+
   const lines = block.split('\n');
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed) continue;
-    // Match **Bold label**: or **Bold label** at start of line – use only the label as concept name
+
     const boldMatch = trimmed.match(/^\*\*(.+?)\*\*\s*:?\s*/);
     if (boldMatch) {
       add(boldMatch[1].trim());
       continue;
     }
-    // Match - item or * item or 1. item
+
     const listMatch = trimmed.match(/^[-*]\s+(.+)$/) || trimmed.match(/^\d+\.\s+(.+)$/);
     if (listMatch) {
       const rest = listMatch[1].trim();
-      // One line can be "Concept A, Concept B" – split by comma
+      const conceptLabel =
+        rest.match(/^\*\*concept:\*\*\s*(.+)$/i) ||
+        rest.match(/^\*\*concept\*\*:\s*(.+)$/i) ||
+        rest.match(/^concept:\s*(.+)$/i);
+      if (conceptLabel && conceptLabel[1]) {
+        add(conceptLabel[1]);
+        continue;
+      }
+
       if (rest.includes(',')) {
         rest.split(',').forEach((part) => add(part));
       } else {
@@ -82,13 +152,13 @@ function extractListItems(block: string): string[] {
       }
       continue;
     }
-    // Line like "Concepts: X, Y, Z" or "Keywords: A, B"
+
     const labelMatch = trimmed.match(/^(?:concepts?|keywords?|terms?)\s*[:\-]\s*(.+)$/i);
     if (labelMatch) {
       labelMatch[1].split(',').forEach((part) => add(part));
       continue;
     }
-    // Short non-list line as single concept (skip long lines or full sentences)
+
     if (
       trimmed.length <= 60 &&
       !trimmed.startsWith('#') &&
@@ -98,46 +168,134 @@ function extractListItems(block: string): string[] {
       add(trimmed);
     }
   }
+
   return items;
 }
 
-/**
- * Splits markdown by ## (or first #) headings and returns blocks with their titles.
- */
-type HeadingBlock = {
-  title: string;
-  normalizedTitle: string;
-  content: string;
-};
+function extractConceptsFromSectionOne(content: string): string[] {
+  const lines = content.split('\n');
+  const concepts: string[] = [];
+  const seen = new Set<string>();
+  let inConceptSubsection = false;
 
-function splitByHeadings(markdown: string): HeadingBlock[] {
-  const blocks: HeadingBlock[] = [];
-  // Normalize: treat single # as ## for first heading so we get one intro block
-  const normalized = markdown.trimStart().replace(/^(#)\s/m, '## ');
-  const parts = normalized.split(/(?=^##\s)/m);
-  for (const part of parts) {
-    const trimmed = part.trim();
+  const add = (value: string) => {
+    const clean = value.trim();
+    if (!clean || clean.length > 80) return;
+    const key = clean.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    concepts.push(clean);
+  };
+
+  for (const line of lines) {
+    const trimmed = line.trim();
     if (!trimmed) continue;
-    const firstLineEnd = trimmed.indexOf('\n');
-    const firstLine = firstLineEnd === -1 ? trimmed : trimmed.slice(0, firstLineEnd);
-    const rawTitle = firstLine.replace(/^##\s*/, '').trim();
-    const normalizedTitle = normalizeHeading(rawTitle);
-    const content = firstLineEnd === -1 ? '' : trimmed.slice(firstLineEnd + 1).trim();
-    blocks.push({ title: rawTitle, normalizedTitle, content });
+
+    if (trimmed.startsWith('### ')) {
+      const title = normalizeHeading(trimmed.replace(/^###\s*/, ''));
+      if (title.startsWith('1.1 concepts')) {
+        inConceptSubsection = true;
+        continue;
+      }
+      if (inConceptSubsection) break;
+      continue;
+    }
+
+    if (!inConceptSubsection) continue;
+
+    const listMatch = trimmed.match(/^[-*]\s+(.+)$/) || trimmed.match(/^\d+\.\s+(.+)$/);
+    if (!listMatch) continue;
+
+    const value = listMatch[1].trim();
+    const conceptMatch =
+      value.match(/^\*\*concept:\*\*\s*(.+)$/i) ||
+      value.match(/^\*\*concept\*\*:\s*(.+)$/i) ||
+      value.match(/^concept:\s*(.+)$/i);
+
+    if (conceptMatch && conceptMatch[1]) {
+      add(conceptMatch[1]);
+    }
   }
-  return blocks;
+
+  return concepts;
 }
 
-/**
- * Parses tutorial markdown into prerequisites and steps.
- * - Prerequisites: section whose title matches "Prerequisites", "Concepts", etc.; list items become concepts.
- * - Steps: every other ## section becomes a step card (intro + numbered steps).
- */
-export function parseTutorialContent(markdown: string): ParsedTutorial {
+function extractStepsFromSectionFive(content: string): TutorialStep[] {
+  const steps: TutorialStep[] = [];
+  const blocks = splitBySubheadings(content);
+
+  for (const block of blocks) {
+    if (!block.normalizedTitle.startsWith('step')) continue;
+    const id = `step-${steps.length + 1}`;
+    steps.push({
+      id,
+      title: cleanStepTitle(block.title) || `Step ${steps.length + 1}`,
+      content: block.content,
+    });
+  }
+
+  return steps;
+}
+
+function parseV2Tutorial(blocks: HeadingBlock[], markdown: string): ParsedTutorial {
   const prerequisites: string[] = [];
   const sections: TutorialSection[] = [];
   const steps: TutorialStep[] = [];
-  const blocks = splitByHeadings(markdown);
+
+  for (const block of blocks) {
+    const sectionNumber = parseV2SectionNumber(block.title);
+    if (sectionNumber === null) continue;
+
+    if (sectionNumber === 1) {
+      prerequisites.push(...extractConceptsFromSectionOne(block.content));
+      sections.push({
+        id: `section-${sections.length + 1}`,
+        title: titleCase(block.title || 'Section 1'),
+        content: block.content,
+      });
+      continue;
+    }
+
+    if (sectionNumber === 5) {
+      const parsedSteps = extractStepsFromSectionFive(block.content);
+      if (parsedSteps.length > 0) {
+        steps.push(...parsedSteps);
+      } else if (block.content.trim()) {
+        steps.push({
+          id: `step-${steps.length + 1}`,
+          title: 'Implementation Plan',
+          content: block.content,
+        });
+      }
+      continue;
+    }
+
+    sections.push({
+      id: `section-${sections.length + 1}`,
+      title: titleCase(block.title || `Section ${sectionNumber}`),
+      content: block.content,
+    });
+  }
+
+  const dedupedPrerequisites = Array.from(
+    new Map(prerequisites.map((item) => [item.toLowerCase(), item])).values()
+  );
+
+  if (steps.length === 0 && markdown.trim()) {
+    const firstLineEnd = markdown.indexOf('\n');
+    const firstLine = firstLineEnd === -1 ? markdown : markdown.slice(0, firstLineEnd);
+    const title = firstLine.replace(/^#+\s*/, '').trim() || 'Introduction';
+    const content = firstLineEnd === -1 ? '' : markdown.slice(firstLineEnd + 1).trim();
+    steps.push({ id: 'step-1', title, content });
+  }
+
+  return { prerequisites: dedupedPrerequisites, sections, steps };
+}
+
+function parseLegacyTutorial(blocks: HeadingBlock[], markdown: string): ParsedTutorial {
+  const prerequisites: string[] = [];
+  const sections: TutorialSection[] = [];
+  const steps: TutorialStep[] = [];
 
   for (const block of blocks) {
     const titleLower = block.normalizedTitle;
@@ -150,6 +308,7 @@ export function parseTutorialContent(markdown: string): ParsedTutorial {
       prerequisites.push(...items);
       continue;
     }
+
     const isStep = titleLower.startsWith('step');
     if (isStep) {
       const id = `step-${steps.length + 1}`;
@@ -182,7 +341,6 @@ export function parseTutorialContent(markdown: string): ParsedTutorial {
     });
   }
 
-  // If no ## blocks, treat whole content as a single step (e.g. raw markdown with # title only)
   if (steps.length === 0 && markdown.trim()) {
     const firstLineEnd = markdown.indexOf('\n');
     const firstLine = firstLineEnd === -1 ? markdown : markdown.slice(0, firstLineEnd);
@@ -192,6 +350,19 @@ export function parseTutorialContent(markdown: string): ParsedTutorial {
   }
 
   return { prerequisites, sections, steps };
+}
+
+/**
+ * Parses tutorial markdown into prerequisites and steps.
+ */
+export function parseTutorialContent(markdown: string): ParsedTutorial {
+  const blocks = splitByHeadings(markdown);
+  const hasNumberedSections = blocks.some((block) => parseV2SectionNumber(block.title) !== null);
+
+  if (hasNumberedSections) {
+    return parseV2Tutorial(blocks, markdown);
+  }
+  return parseLegacyTutorial(blocks, markdown);
 }
 
 function titleCase(text: string): string {
