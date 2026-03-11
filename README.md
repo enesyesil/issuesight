@@ -9,6 +9,10 @@
 
 ---
 
+![IssueSight Main Page](./issuesight-img.png)
+
+---
+
 ## The Engineering Goal
 **IssueSight** is a distributed, event-driven platform designed to solve a specific problem in the Open Source ecosystem: **Context Switching**.
 
